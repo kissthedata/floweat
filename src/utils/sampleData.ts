@@ -18,7 +18,7 @@ export async function generateSampleDiaries() {
     const mealTimes: MealTime[] = ['breakfast', 'lunch', 'dinner'];
     const selectedMeals = mealTimes.slice(0, numMeals);
 
-    selectedMeals.forEach((mealTime) => {
+    for (const mealTime of selectedMeals) {
       const mealData = getSampleMealData(mealTime);
       const timestamp = new Date(date);
 
@@ -38,7 +38,7 @@ export async function generateSampleDiaries() {
       };
 
       await saveDiary(diary);
-    });
+    }
   }
 }
 

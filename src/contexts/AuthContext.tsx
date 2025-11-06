@@ -18,19 +18,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // 초기 세션 확인
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setUser(session?.user ?? null);
 
-      // 세션이 없으면 익명 로그인
-      if (!session) {
-        supabase.auth.signInAnonymously().then(({ data }) => {
+        // 세션이 없으면 익명 로그인
+        if (!session) {
+          return supabase.auth.signInAnonymously();
+        }
+        return { data: { user: session.user } };
+      })
+      .then(({ data }) => {
+        if (data?.user) {
           setUser(data.user);
-          setLoading(false);
-        });
-      } else {
+        }
         setLoading(false);
-      }
-    });
+      })
+      .catch((error) => {
+        console.error('Supabase 인증 에러:', error);
+        console.warn('⚠️ Supabase가 설정되지 않았습니다. .env 파일을 확인하세요.');
+        setLoading(false);
+      });
 
     // 인증 상태 변경 감지
     const {
