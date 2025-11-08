@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, DayDetailModal } from '../components/diary';
 import { Card } from '../components/common';
 import { getMonthlyStats, getAllDiaries } from '../services/supabaseService';
-import { generateSampleDiaries, clearAllDiaries } from '../utils/sampleData';
+import { clearAllDiaries } from '../utils/sampleData';
 import type { MealTime } from '../types';
 
 export default function DiaryPage() {
@@ -38,11 +38,6 @@ export default function DiaryPage() {
     setTimeout(() => setSelectedDate(null), 300);
   };
 
-  const handleGenerateSamples = async () => {
-    await generateSampleDiaries();
-    setRefreshKey(prev => prev + 1);
-  };
-
   const handleClearAll = async () => {
     if (window.confirm('모든 식단 기록을 삭제하시겠습니까?')) {
       await clearAllDiaries();
@@ -59,21 +54,6 @@ export default function DiaryPage() {
       </div>
 
       <div className="page-content">
-        {/* 샘플 데이터 생성 (개발용) */}
-        {!hasDiaries && (
-          <Card variant="flat" padding="lg" className="mb-6 bg-primary-light">
-            <p className="text-sm text-text-secondary mb-3">
-              아직 식단 기록이 없습니다. 테스트를 위해 샘플 데이터를 생성해보세요!
-            </p>
-            <button
-              onClick={handleGenerateSamples}
-              className="w-full py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl font-medium text-sm transition-colors"
-            >
-              📊 샘플 데이터 생성 (14일치)
-            </button>
-          </Card>
-        )}
-
         {hasDiaries && (
           <div className="mb-6">
             <button

@@ -8,7 +8,8 @@
       "Bash(ForEach-Object { git update-ref -d $_ })",
       "Bash(git update-ref:*)",
       "Bash(git reflog:*)",
-      "Bash(git gc:*)"
+      "Bash(git gc:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

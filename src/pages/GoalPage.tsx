@@ -33,8 +33,14 @@ export default function GoalPage() {
     if (state?.imageUrl) {
       setImageUrl(state.imageUrl);
     } else {
-      // 이미지가 없으면 홈으로 리다이렉트
-      navigate('/');
+      // localStorage에서 확인 (fallback)
+      const tempImage = localStorage.getItem('tempFoodImage');
+      if (tempImage) {
+        setImageUrl(tempImage);
+      } else {
+        // 이미지가 없으면 홈으로 리다이렉트
+        navigate('/');
+      }
     }
   }, [location, navigate]);
 

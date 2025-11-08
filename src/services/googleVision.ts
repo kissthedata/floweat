@@ -21,9 +21,13 @@ export async function detectFoods(imageBase64: string): Promise<DetectedFood[]> 
 
   if (!apiKey) {
     console.warn('Google Vision API key not found');
-    // API 키가 없을 때는 Mock 데이터 반환
-    return getMockDetectedFoods();
+    return [];
   }
+
+  // Data URL에서 순수 base64만 추출 (data:image/jpeg;base64, 제거)
+  const base64Content = imageBase64.includes('base64,')
+    ? imageBase64.split('base64,')[1]
+    : imageBase64;
 
   try {
     const response = await fetch(
@@ -37,7 +41,7 @@ export async function detectFoods(imageBase64: string): Promise<DetectedFood[]> 
           requests: [
             {
               image: {
-                content: imageBase64,
+                content: base64Content,
               },
               features: [
                 {
@@ -56,6 +60,11 @@ export async function detectFoods(imageBase64: string): Promise<DetectedFood[]> 
     );
 
     const data = await response.json();
+
+    if (!response.ok) {
+      console.error('Google Vision API error:', data);
+      return [];
+    }
 
     if (data.responses && data.responses[0]) {
       const result = data.responses[0];
@@ -93,13 +102,13 @@ export async function detectFoods(imageBase64: string): Promise<DetectedFood[]> 
           });
       }
 
-      return detectedFoods.length > 0 ? detectedFoods : getMockDetectedFoods();
+      return detectedFoods;
     }
 
-    return getMockDetectedFoods();
+    return [];
   } catch (error) {
     console.error('Google Vision API error:', error);
-    return getMockDetectedFoods();
+    return [];
   }
 }
 
@@ -170,27 +179,4 @@ function translateToKorean(englishName: string): string {
 
   const lower = englishName.toLowerCase();
   return translations[lower] || englishName;
-}
-
-/**
- * Mock 감지 결과 (테스트용)
- */
-function getMockDetectedFoods(): DetectedFood[] {
-  return [
-    {
-      name: '밥',
-      confidence: 0.95,
-      boundingBox: { x: 0.1, y: 0.3, width: 0.25, height: 0.35 },
-    },
-    {
-      name: '된장찌개',
-      confidence: 0.88,
-      boundingBox: { x: 0.4, y: 0.2, width: 0.3, height: 0.4 },
-    },
-    {
-      name: '김치',
-      confidence: 0.82,
-      boundingBox: { x: 0.75, y: 0.4, width: 0.2, height: 0.25 },
-    },
-  ];
 }

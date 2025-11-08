@@ -24,7 +24,7 @@ Unlike traditional calorie apps, FLOW:EAT focuses on **how to eat** (eating orde
 - **Routing**: React Router v6
 - **AI Integration**: OpenAI GPT-4 Vision API & Google Vision API
 - **State**: localStorage (MVP), future: backend integration
-- **Primary Color**: `#dfb0f2` (lavender)
+- **Primary Color**: `#ee58f3` (pink)
 
 ## Development Commands
 
@@ -73,9 +73,9 @@ src/
 
 ### Colors
 ```typescript
-Primary: #dfb0f2        // Lavender (main CTA)
-Primary-dark: #c78ee0   // Hover/active state
-Primary-light: #f5e6ff  // Background accents
+Primary: #ee58f3        // Pink (main CTA)
+Primary-dark: #d63ddb   // Hover/active state
+Primary-light: #f9d4fd  // Background accents
 
 Background: #ffffff     // Main background
 Surface: #fafafa        // Card background

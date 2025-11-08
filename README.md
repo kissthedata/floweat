@@ -76,7 +76,7 @@ src/
 
 ## 디자인 시스템
 
-- **Primary Color**: `#dfb0f2` (라벤더)
+- **Primary Color**: `#ee58f3` (핑크)
 - **Typography**: Pretendard/Apple SD Gothic Neo
 - **Style**: Toss-inspired clean UI
 

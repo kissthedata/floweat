@@ -20,9 +20,8 @@ export default function CameraPage() {
 
   const handleUpload = () => {
     if (image) {
-      // 이미지를 localStorage에 임시 저장
-      localStorage.setItem('tempFoodImage', image);
-      navigate('/goal');
+      // 목표 선택 페이지로 이동하면서 이미지 전달
+      navigate('/goal', { state: { imageUrl: image } });
     }
   };
 
@@ -52,7 +51,7 @@ export default function CameraPage() {
           {image ? (
             <div className="relative w-full max-w-md">
               <img
-                src="C:\Users\USER\Desktop\floweat\public\icons\camera-3d.png"
+                src={image}
                 alt="Selected food"
                 className="w-full rounded-card shadow-lg"
               />

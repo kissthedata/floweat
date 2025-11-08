@@ -15,8 +15,7 @@ export async function analyzeFoodImage(
   goal: EatingGoal
 ): Promise<MealAnalysis> {
   if (!OPENAI_API_KEY) {
-    // Mock response for development without API key
-    return getMockAnalysis(goal);
+    throw new Error('OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your .env file.');
   }
 
   const goalDescriptions = {
@@ -68,7 +67,7 @@ export async function analyzeFoodImage(
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4-vision-preview',
+        model: 'gpt-4o',
         messages: [
           {
             role: 'user',
@@ -89,6 +88,7 @@ export async function analyzeFoodImage(
           },
         ],
         max_tokens: 1000,
+        response_format: { type: 'json_object' },
       }),
     });
 
@@ -97,7 +97,11 @@ export async function analyzeFoodImage(
     }
 
     const data: OpenAIVisionResponse = await response.json();
-    const content = data.choices[0].message.content;
+    let content = data.choices[0].message.content;
+
+    // Remove markdown code blocks if present (```json ... ```)
+    content = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
+
     const parsed = JSON.parse(content);
 
     // Calculate total nutrition
@@ -138,92 +142,6 @@ export async function analyzeFoodImage(
     };
   } catch (error) {
     console.error('Error analyzing food image:', error);
-    return getMockAnalysis(goal);
+    throw new Error(`Failed to analyze food image: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-}
-
-// Mock data for development/testing
-function getMockAnalysis(goal: EatingGoal): MealAnalysis {
-  const goalNames = {
-    digestion: '소화 편안',
-    satiety: '포만감 유지',
-    energy: '졸림 방지',
-  };
-
-  return {
-    imageUrl: '',
-    foods: [
-      {
-        name: '된장찌개',
-        category: 'protein',
-        calories: 180,
-        nutrition: {
-          carbs: 15,
-          protein: 12,
-          fat: 8,
-          sugar: 3,
-          sodium: 850,
-        },
-      },
-      {
-        name: '백미밥',
-        category: 'carbohydrate',
-        calories: 300,
-        nutrition: {
-          carbs: 68,
-          protein: 6,
-          fat: 1,
-          sugar: 0,
-          sodium: 0,
-        },
-      },
-      {
-        name: '배추김치',
-        category: 'vegetable',
-        calories: 40,
-        nutrition: {
-          carbs: 8,
-          protein: 2,
-          fat: 0,
-          sugar: 4,
-          sodium: 420,
-        },
-      },
-    ],
-    totalCalories: 520,
-    totalNutrition: {
-      carbs: 91,
-      protein: 20,
-      fat: 9,
-      sugar: 7,
-      sodium: 1270,
-    },
-    eatingOrder: {
-      goal,
-      goalName: goalNames[goal],
-      steps: [
-        {
-          order: 1,
-          category: 'vegetable',
-          categoryName: '야채/섬유질',
-          description: '김치를 먼저 드세요',
-        },
-        {
-          order: 2,
-          category: 'protein',
-          categoryName: '단백질',
-          description: '된장찌개의 건더기를 드세요',
-        },
-        {
-          order: 3,
-          category: 'carbohydrate',
-          categoryName: '탄수화물',
-          description: '밥은 마지막에 드세요',
-        },
-      ],
-      reason:
-        '섬유질과 단백질을 먼저 섭취하면 혈당 상승이 완만해져 포만감이 오래 지속됩니다.',
-    },
-    timestamp: Date.now(),
-  };
 }
