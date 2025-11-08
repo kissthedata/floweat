@@ -127,7 +127,7 @@ export default function ResultPage() {
 
       <div className="page-content">
         <h1 className="text-[26px] font-bold text-text-primary mb-6 leading-[1.4]">
-          이렇게 드세요
+          이렇게 드세요!
         </h1>
 
         {/* 업로드한 이미지와 음식 감지 */}

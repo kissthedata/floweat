@@ -61,9 +61,9 @@ export default function GoalPage() {
 
       <div className="page-content">
         <h1 className="text-[26px] font-bold text-text-primary mb-8 leading-[1.4]">
-          어떤 식사가
+          어떤 식사를
           <br />
-           편하세요?
+           원하세요?
         </h1>
 
         <div className="space-y-3">

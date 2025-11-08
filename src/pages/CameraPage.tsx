@@ -20,8 +20,9 @@ export default function CameraPage() {
 
   const handleUpload = () => {
     if (image) {
-      // 이미지를 state로 전달
-      navigate('/goal', { state: { imageUrl: image } });
+      // 이미지를 localStorage에 임시 저장
+      localStorage.setItem('tempFoodImage', image);
+      navigate('/goal');
     }
   };
 
@@ -51,7 +52,7 @@ export default function CameraPage() {
           {image ? (
             <div className="relative w-full max-w-md">
               <img
-                src={image}
+                src="C:\Users\USER\Desktop\floweat\public\icons\camera-3d.png"
                 alt="Selected food"
                 className="w-full rounded-card shadow-lg"
               />
@@ -67,7 +68,11 @@ export default function CameraPage() {
               onClick={() => fileInputRef.current?.click()}
               className="w-full max-w-md h-64 border-2 border-dashed border-border rounded-card flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary-light transition-colors"
             >
-              <span className="text-6xl mb-4">📷</span>
+              <img
+                src="/icons/camera-3d.png"
+                alt="Camera icon"
+                className="w-16 h-16 mb-4"
+              />
               <p className="text-base font-medium text-text-primary">
                 사진 선택하기
               </p>
@@ -81,6 +86,7 @@ export default function CameraPage() {
             ref={fileInputRef}
             type="file"
             accept="image/*"
+            capture="environment"
             onChange={handleFileSelect}
             className="hidden"
           />
