@@ -22,22 +22,24 @@ export type MealTime =
 export interface FoodItem {
   name: string;
   category: FoodCategory;
-  calories: number;
-  nutrition: {
-    carbs: number;      // 탄수화물 (g)
-    protein: number;    // 단백질 (g)
-    fat: number;        // 지방 (g)
-    sugar: number;      // 당 (g)
-    sodium: number;     // 나트륨 (mg)
+  nutritionBenefits?: string;  // 영양소 및 건강 효능 설명 (2차 분석 후 추가)
+  nutrition?: {                // 영양 성분 (2차 분석 후 추가)
+    carbs: number;         // 탄수화물 (g)
+    protein: number;       // 단백질 (g)
+    fat: number;           // 지방 (g)
+  };
+  warnings?: {                 // 주의사항 (2차 분석 후 추가)
+    timing?: string;           // 섭취 시간대 주의
+    overconsumption?: string;  // 과다섭취 주의
+    general?: string;          // 일반 주의사항
   };
 }
 
 // 먹는 순서 단계
 export interface EatingStep {
   order: number;
-  category: FoodCategory;
-  categoryName: string;
-  description: string;
+  foodName: string;      // 실제 음식 이름 (예: "브로콜리")
+  description: string;   // 설명
 }
 
 // 먹는 순서 추천
@@ -52,15 +54,13 @@ export interface EatingOrderGuide {
 export interface MealAnalysis {
   imageUrl: string;
   foods: FoodItem[];
-  totalCalories: number;
   totalNutrition: {
-    carbs: number;
-    protein: number;
-    fat: number;
-    sugar: number;
-    sodium: number;
+    carbs: number;     // 탄수화물
+    protein: number;   // 단백질
+    fat: number;       // 지방
   };
   eatingOrder: EatingOrderGuide;
+  nutritionAnalysis?: string;  // AI 영양 분석 코멘트
   timestamp: number;
 }
 

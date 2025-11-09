@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import HomePage from './pages/HomePage';
-import CameraPage from './pages/CameraPage';
 import GoalPage from './pages/GoalPage';
 import ResultPage from './pages/ResultPage';
 import DiaryPage from './pages/DiaryPage';
@@ -32,7 +31,6 @@ function App() {
             />
 
             {/* 풀스크린 페이지들 (탭바 없음) */}
-            <Route path="/camera" element={<CameraPage />} />
             <Route path="/goal" element={<GoalPage />} />
             <Route path="/result" element={<ResultPage />} />
           </Routes>

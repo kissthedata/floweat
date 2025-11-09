@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/common';
 import { getRecentDiaries } from '../services/supabaseService';
@@ -8,6 +8,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [recentMeals, setRecentMeals] = useState<FoodDiary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function loadRecentMeals() {
@@ -22,6 +23,23 @@ export default function HomePage() {
     }
     loadRecentMeals();
   }, []);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const imageUrl = reader.result as string;
+      // 바로 goal 페이지로 이동
+      navigate('/goal', { state: { imageUrl } });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const formatTimeAgo = (timestamp: number) => {
     const now = Date.now();
@@ -50,45 +68,35 @@ export default function HomePage() {
           플로잇이 순서를 알려드릴게요!
         </h1>
 
-        <div className="grid grid-cols-2 gap-3 mb-8">
-          <Card
-            variant="default"
-            padding="lg"
-            clickable
-            onClick={() => navigate('/camera')}
-            className="aspect-square"
-          >
-            <div className="h-full flex flex-col items-center justify-center gap-3">
-              <img
-                src="/icons/camera-3d.png"
-                alt="사진 촬영"
-                className="w-[100px] h-[100px] object-contain"
-              />
-              <p className="text-lg font-medium text-text-primary text-center">
-                사진 촬영하기
-              </p>
-            </div>
-          </Card>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
 
-          <Card
-            variant="default"
-            padding="lg"
-            clickable
-            onClick={() => navigate('/camera')}
-            className="aspect-square"
-          >
-            <div className="h-full flex flex-col items-center justify-center gap-3">
-              <img
-                src="/icons/gallery-3d.png"
-                alt="갤러리"
-                className="w-[100px] h-[100px] object-contain"
-              />
-              <p className="text-lg font-medium text-text-primary text-center">
-                갤러리에서 선택
-              </p>
-            </div>
-          </Card>
-        </div>
+        <Card
+          variant="default"
+          padding="lg"
+          clickable
+          onClick={handleUploadClick}
+          className="mb-8"
+        >
+          <div className="flex flex-col items-center justify-center gap-4 py-8">
+            <img
+              src="/icons/camera-3d.png"
+              alt="사진 올리기"
+              className="w-[120px] h-[120px] object-contain"
+            />
+            <p className="text-xl font-bold text-text-primary text-center">
+              내 한 끼 사진 올리기
+            </p>
+            <p className="text-sm text-text-secondary text-center">
+              사진 촬영 또는 갤러리에서 선택
+            </p>
+          </div>
+        </Card>
 
         <div className="mt-10">
           <div className="flex items-center justify-between mb-4">
@@ -130,7 +138,7 @@ export default function HomePage() {
                         {meal.foods.map((f) => f.name).join(', ')}
                       </h3>
                       <p className="text-sm text-text-tertiary mt-1">
-                        {meal.totalCalories}kcal · {formatTimeAgo(meal.timestamp)}
+                        {formatTimeAgo(meal.timestamp)}
                       </p>
                     </div>
                     {meal.imageUrl && (

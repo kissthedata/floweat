@@ -10,13 +10,10 @@ interface DbFoodDiary {
   user_id: string;
   meal_time: string;
   image_url: string | null;
-  total_calories: number;
   total_nutrition: {
     carbs: number;
     protein: number;
     fat: number;
-    sugar: number;
-    sodium: number;
   };
   eating_goal: string;
   eating_goal_name: string;
@@ -34,13 +31,11 @@ interface DbFood {
   diary_id: string;
   name: string;
   category: string;
-  calories: number;
+  nutrition_benefits: string;
   nutrition: {
     carbs: number;
     protein: number;
     fat: number;
-    sugar: number;
-    sodium: number;
   };
 }
 
@@ -48,8 +43,7 @@ interface DbEatingOrderStep {
   id: string;
   diary_id: string;
   order_number: number;
-  category: string;
-  category_name: string;
+  food_name: string;
   description: string;
 }
 
@@ -108,7 +102,6 @@ export async function saveDiary(diary: Omit<FoodDiary, 'id'>): Promise<FoodDiary
         user_id: user.id,
         meal_time: diary.mealTime,
         image_url: diary.imageUrl,
-        total_calories: diary.totalCalories,
         total_nutrition: diary.totalNutrition,
         eating_goal: diary.eatingOrder.goal,
         eating_goal_name: diary.eatingOrder.goalName,
@@ -126,7 +119,7 @@ export async function saveDiary(diary: Omit<FoodDiary, 'id'>): Promise<FoodDiary
       diary_id: savedDiary.id,
       name: food.name,
       category: food.category,
-      calories: food.calories,
+      nutrition_benefits: food.nutritionBenefits,
       nutrition: food.nutrition,
     }));
 
@@ -141,8 +134,7 @@ export async function saveDiary(diary: Omit<FoodDiary, 'id'>): Promise<FoodDiary
     const stepsToInsert = diary.eatingOrder.steps.map((step) => ({
       diary_id: savedDiary.id,
       order_number: step.order,
-      category: step.category,
-      category_name: step.categoryName,
+      food_name: step.foodName,
       description: step.description,
     }));
 
@@ -257,29 +249,10 @@ export async function getRecentDiaries(limit: number = 5): Promise<FoodDiary[]> 
 }
 
 /**
- * 특정 기간의 총 칼로리 계산
- */
-export async function getTotalCaloriesByPeriod(
-  startDate: Date,
-  endDate: Date
-): Promise<number> {
-  const allDiaries = await getAllDiaries();
-  return allDiaries
-    .filter((diary) => {
-      const diaryDate = new Date(diary.timestamp);
-      return diaryDate >= startDate && diaryDate <= endDate;
-    })
-    .reduce((sum, diary) => sum + diary.totalCalories, 0);
-}
-
-/**
  * 월별 통계 계산
  */
 export async function getMonthlyStats(year: number, month: number) {
   const diaries = await getDiariesByMonth(year, month);
-
-  const totalCalories = diaries.reduce((sum, diary) => sum + diary.totalCalories, 0);
-  const avgCalories = diaries.length > 0 ? Math.round(totalCalories / diaries.length) : 0;
 
   const mealCounts = {
     breakfast: diaries.filter((d) => d.mealTime === 'breakfast').length,
@@ -289,8 +262,6 @@ export async function getMonthlyStats(year: number, month: number) {
 
   return {
     totalMeals: diaries.length,
-    totalCalories,
-    avgCalories,
     mealCounts,
   };
 }
@@ -326,18 +297,16 @@ function convertDbToFoodDiary(
     foods: foods.map((f) => ({
       name: f.name,
       category: f.category as any,
-      calories: f.calories,
+      nutritionBenefits: f.nutrition_benefits,
       nutrition: f.nutrition,
     })),
-    totalCalories: dbDiary.total_calories,
     totalNutrition: dbDiary.total_nutrition,
     eatingOrder: {
       goal: dbDiary.eating_goal as any,
       goalName: dbDiary.eating_goal_name,
       steps: steps.map((s) => ({
         order: s.order_number,
-        category: s.category as any,
-        categoryName: s.category_name,
+        foodName: s.food_name,
         description: s.description,
       })),
       reason: dbDiary.eating_reason,
