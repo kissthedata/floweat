@@ -10,7 +10,8 @@
       "Bash(git reflog:*)",
       "Bash(git gc:*)",
       "WebSearch",
-      "Bash(del \"C:\\Users\\USER\\Desktop\\floweat\\src\\pages\\CameraPage.tsx\")"
+      "Bash(del \"C:\\Users\\USER\\Desktop\\floweat\\src\\pages\\CameraPage.tsx\")",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
