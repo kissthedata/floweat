@@ -73,7 +73,20 @@ export async function detectFoodsFromImage(
     let content = data.choices[0].message.content;
     content = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
 
-    const parsed = JSON.parse(content);
+    console.log('OpenAI food detection response:', content.substring(0, 200) + '...');
+
+    if (!content || content.length === 0) {
+      throw new Error('Empty response from OpenAI');
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (parseError) {
+      console.error('Failed to parse JSON. Full content:', content);
+      throw new Error(`Invalid JSON response: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
+    }
+
     return parsed.foods;
   } catch (error) {
     console.error('Error detecting foods:', error);
@@ -177,7 +190,7 @@ ${foodList}
             content: prompt,
           },
         ],
-        max_tokens: 1500,
+        max_tokens: 2000,
         response_format: { type: 'json_object' },
       }),
     });
@@ -192,7 +205,21 @@ ${foodList}
     let content = data.choices[0].message.content;
     content = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
 
-    const parsed = JSON.parse(content);
+    // 응답 내용 로깅 (디버깅용)
+    console.log('OpenAI nutrition analysis response:', content.substring(0, 200) + '...');
+
+    // JSON 파싱 전 응답 완전성 검증
+    if (!content || content.length === 0) {
+      throw new Error('Empty response from OpenAI');
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (parseError) {
+      console.error('Failed to parse JSON. Full content:', content);
+      throw new Error(`Invalid JSON response: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
+    }
 
     // Calculate total nutrition (탄단지만)
     const totalNutrition = parsed.foods.reduce(
@@ -305,7 +332,7 @@ export async function analyzeFoodImage(
             ],
           },
         ],
-        max_tokens: 1000,
+        max_tokens: 2000,
         response_format: { type: 'json_object' },
       }),
     });
@@ -322,7 +349,19 @@ export async function analyzeFoodImage(
     // Remove markdown code blocks if present (```json ... ```)
     content = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
 
-    const parsed = JSON.parse(content);
+    console.log('OpenAI food image analysis response:', content.substring(0, 200) + '...');
+
+    if (!content || content.length === 0) {
+      throw new Error('Empty response from OpenAI');
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (parseError) {
+      console.error('Failed to parse JSON. Full content:', content);
+      throw new Error(`Invalid JSON response: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
+    }
 
     // Calculate total nutrition
     const totalNutrition = parsed.foods.reduce(
