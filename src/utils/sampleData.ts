@@ -314,10 +314,3 @@ function getSampleMealData(mealTime: MealTime) {
   }
 }
 
-/**
- * 샘플 데이터 초기화 (기존 데이터 삭제)
- */
-export async function clearAllDiaries() {
-  const { clearAllDiaries: clear } = await import('../services/supabaseService');
-  await clear();
-}

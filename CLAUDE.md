@@ -23,8 +23,9 @@ Unlike traditional calorie apps, FLOW:EAT focuses on **how to eat** (eating orde
 - **Styling**: Tailwind CSS (Toss-style UI)
 - **Routing**: React Router v6
 - **AI Integration**: OpenAI GPT-4 Vision API & Google Vision API
-- **State**: localStorage (MVP), future: backend integration
-- **Primary Color**: `#ee58f3` (pink)
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth (with anonymous user support)
+- **Primary Color**: `#4ae523` (green)
 
 ## Development Commands
 
@@ -73,9 +74,9 @@ src/
 
 ### Colors
 ```typescript
-Primary: #ee58f3        // Pink (main CTA)
-Primary-dark: #d63ddb   // Hover/active state
-Primary-light: #f9d4fd  // Background accents
+Primary: #4ae523        // Green (main CTA)
+Primary-dark: #3bc91e   // Hover/active state
+Primary-light: #d4fdc8  // Background accents
 
 Background: #ffffff     // Main background
 Surface: #fafafa        // Card background
@@ -118,12 +119,21 @@ Border: #f0f0f0         // Dividers
 - `satiety`: Long-lasting fullness
 - `energy`: Prevent post-meal fatigue
 
-## State Management
+## Data Storage
 
-### LocalStorage Keys
-- `tempFoodImage`: Temporary image during upload flow
-- `foodDiary`: Array of saved meal records (JSON)
-- `userPreferences`: User settings (future)
+### Supabase Database
+All persistent data is stored in Supabase PostgreSQL:
+- **food_diaries**: Main diary records (meal time, timestamp, eating goal, user feedback)
+- **foods**: Food items with nutrition data (linked to diaries)
+- **eating_order_steps**: Recommended eating order steps (linked to diaries)
+- **calendar_cache**: Cached monthly calendar data for performance (30-minute TTL)
+
+### Image Storage
+- Food images are temporarily passed via React Router state
+- Permanent image URLs stored in `food_diaries.image_url`
+
+### No localStorage Usage
+The app does not use localStorage. All data persistence is handled by Supabase.
 
 ## API Keys Setup
 

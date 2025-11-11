@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Button, Card } from '../components/common';
 import { FoodDetectionImage } from '../components/result';
-import { saveDiary } from '../services/supabaseService';
+import { saveDiary, invalidateCalendarCache } from '../services/supabaseService';
 import { detectFoodsFromImage, analyzeNutritionAndOrder } from '../services/openai';
 import type { MealTime, FoodDiary, MealAnalysis, FoodCategory } from '../types';
 
@@ -111,6 +111,13 @@ export default function ResultPage() {
     };
 
     await saveDiary(diary);
+
+    // 캐시 무효화 (저장된 diary의 월)
+    const savedDate = new Date(finalAnalysis.timestamp);
+    const year = savedDate.getFullYear();
+    const month = savedDate.getMonth();
+    await invalidateCalendarCache(year, month);
+
     navigate('/');
   };
 
@@ -132,10 +139,9 @@ export default function ResultPage() {
 
         <div className="page-content flex items-center justify-center">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-text-primary mb-2">
-              음식을 감지하는 중...
-            </h2>
+            <div className="loader-wrapper mx-auto mb-4" style={{ margin: '0 auto 1rem' }}>
+              <div className="loader"></div>
+            </div>
             <p className="text-sm text-text-secondary">
               AI가 사진에서 음식을 찾고 있어요
             </p>
@@ -273,10 +279,9 @@ export default function ResultPage() {
 
         <div className="page-content flex items-center justify-center">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-text-primary mb-2">
-              영양 정보를 분석하는 중...
-            </h2>
+            <div className="loader-wrapper mx-auto mb-4" style={{ margin: '0 auto 1rem' }}>
+              <div className="loader"></div>
+            </div>
             <p className="text-sm text-text-secondary">
               AI가 영양 정보와 먹는 순서를 계산하고 있어요
             </p>

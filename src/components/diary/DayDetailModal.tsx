@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react';
 import type { FoodDiary, MealTime } from '../../types';
-import { getDiariesByDate } from '../../services/supabaseService';
+import { getDiariesByDate, deleteDiary, invalidateCalendarCache } from '../../services/supabaseService';
 import { formatDate } from '../../utils/dateUtils';
 import { Card } from '../common';
 
 interface DayDetailModalProps {
   date: Date | null;
   onClose: () => void;
+  onRefresh?: () => void;
 }
 
-export default function DayDetailModal({ date, onClose }: DayDetailModalProps) {
+export default function DayDetailModal({ date, onClose, onRefresh }: DayDetailModalProps) {
   const [diaries, setDiaries] = useState<FoodDiary[]>([]);
   const [selectedMealTime, setSelectedMealTime] = useState<MealTime>('breakfast');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (date) {
       async function loadDiaries() {
+        setIsLoading(true);
         const dayDiaries = await getDiariesByDate(date);
         setDiaries(dayDiaries);
 
@@ -23,6 +26,7 @@ export default function DayDetailModal({ date, onClose }: DayDetailModalProps) {
         if (dayDiaries.length > 0) {
           setSelectedMealTime(dayDiaries[0].mealTime);
         }
+        setIsLoading(false);
       }
       loadDiaries();
     }
@@ -30,7 +34,7 @@ export default function DayDetailModal({ date, onClose }: DayDetailModalProps) {
 
   if (!date) return null;
 
-  const currentDiary = diaries.find((d) => d.mealTime === selectedMealTime);
+  const currentDiaries = diaries.filter((d) => d.mealTime === selectedMealTime);
   const availableMealTimes = diaries.map((d) => d.mealTime);
 
   const mealTimeInfo = {
@@ -39,8 +43,29 @@ export default function DayDetailModal({ date, onClose }: DayDetailModalProps) {
     dinner: { name: '저녁', color: 'bg-pastel-dinner', icon: '🌙' },
   };
 
-  // 전체 칼로리 계산
-  const totalDayCalories = diaries.reduce((sum, d) => sum + d.totalCalories, 0);
+  const handleDelete = async (diaryId: string) => {
+    if (window.confirm('이 식사 기록을 삭제하시겠습니까?')) {
+      await deleteDiary(diaryId);
+
+      // 캐시 무효화 (삭제된 diary의 월)
+      if (date) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        await invalidateCalendarCache(year, month);
+      }
+
+      if (onRefresh) onRefresh();
+
+      // 현재 modal의 diaries 업데이트
+      const updatedDiaries = diaries.filter((d) => d.id !== diaryId);
+      setDiaries(updatedDiaries);
+
+      // 삭제 후 남은 기록이 없으면 modal 닫기
+      if (updatedDiaries.length === 0) {
+        onClose();
+      }
+    }
+  };
 
   return (
     <div
@@ -82,7 +107,7 @@ export default function DayDetailModal({ date, onClose }: DayDetailModalProps) {
             </button>
           </div>
           <p className="text-sm text-text-secondary">
-            총 {diaries.length}번의 식사 · {totalDayCalories}kcal
+            총 {diaries.length}번의 식사
           </p>
         </div>
 
@@ -119,121 +144,184 @@ export default function DayDetailModal({ date, onClose }: DayDetailModalProps) {
         </div>
 
         {/* 식사 상세 내용 */}
-        {currentDiary ? (
-          <div className="px-6 py-5">
-            {/* 칼로리 정보 */}
-            <Card variant="flat" padding="lg" className="mb-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-semibold text-text-primary">
-                  영양 정보
-                </h3>
-                <div className="text-2xl font-bold text-primary">
-                  {currentDiary.totalCalories}
-                  <span className="text-sm font-normal text-text-secondary ml-1">
-                    kcal
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-2.5">
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-text-secondary">탄수화물</span>
-                    <span className="text-text-primary font-medium">
-                      {currentDiary.totalNutrition.carbs}g
-                    </span>
+        {isLoading ? (
+          <div className="px-6 py-8 text-center">
+            <p className="text-text-secondary">정보를 불러오고 있습니다! 조금만 기다려 주세요</p>
+          </div>
+        ) : currentDiaries.length > 0 ? (
+          <div className="px-6 py-5 space-y-6">
+            {currentDiaries.map((currentDiary, diaryIndex) => (
+              <div key={currentDiary.id} className="relative">
+                {/* 중복 식사 표시 */}
+                {currentDiaries.length > 1 && (
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-text-primary">
+                      {mealTimeInfo[selectedMealTime].name} {diaryIndex + 1}
+                    </h4>
+                    <button
+                      onClick={() => handleDelete(currentDiary.id)}
+                      className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      🗑️ 삭제
+                    </button>
                   </div>
-                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-pastel-breakfast rounded-full"
-                      style={{
-                        width: `${
-                          (currentDiary.totalNutrition.carbs /
+                )}
+
+                {/* 단일 식사인 경우 삭제 버튼만 */}
+                {currentDiaries.length === 1 && (
+                  <div className="flex justify-end mb-3">
+                    <button
+                      onClick={() => handleDelete(currentDiary.id)}
+                      className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      🗑️ 삭제
+                    </button>
+                  </div>
+                )}
+
+                {/* 영양 정보 */}
+                <Card variant="flat" padding="lg" className="mb-4">
+                  <div className="mb-4">
+                    <h3 className="text-base font-semibold text-text-primary">
+                      영양 정보
+                    </h3>
+                  </div>
+
+                  <div className="flex items-center gap-6">
+                    {/* 파이 차트 */}
+                    <div className="flex-shrink-0">
+                      {(() => {
+                        const total = currentDiary.totalNutrition.carbs +
+                                     currentDiary.totalNutrition.protein +
+                                     currentDiary.totalNutrition.fat;
+                        const carbsPercent = (currentDiary.totalNutrition.carbs / total) * 100;
+                        const proteinPercent = (currentDiary.totalNutrition.protein / total) * 100;
+                        const fatPercent = (currentDiary.totalNutrition.fat / total) * 100;
+
+                        // SVG 도넛 차트 설정
+                        const size = 120;
+                        const strokeWidth = 20;
+                        const radius = (size - strokeWidth) / 2;
+                        const circumference = 2 * Math.PI * radius;
+
+                        // 각 섹션의 길이 계산
+                        const carbsLength = (carbsPercent / 100) * circumference;
+                        const proteinLength = (proteinPercent / 100) * circumference;
+                        const fatLength = (fatPercent / 100) * circumference;
+
+                        return (
+                          <svg width={size} height={size} className="transform -rotate-90">
+                            {/* 배경 원 */}
+                            <circle
+                              cx={size / 2}
+                              cy={size / 2}
+                              r={radius}
+                              fill="none"
+                              stroke="#f0f0f0"
+                              strokeWidth={strokeWidth}
+                            />
+
+                            {/* 탄수화물 */}
+                            <circle
+                              cx={size / 2}
+                              cy={size / 2}
+                              r={radius}
+                              fill="none"
+                              stroke="#ffd6a5"
+                              strokeWidth={strokeWidth}
+                              strokeDasharray={`${carbsLength} ${circumference}`}
+                              strokeDashoffset={0}
+                              strokeLinecap="round"
+                            />
+
+                            {/* 단백질 */}
+                            <circle
+                              cx={size / 2}
+                              cy={size / 2}
+                              r={radius}
+                              fill="none"
+                              stroke="#caffbf"
+                              strokeWidth={strokeWidth}
+                              strokeDasharray={`${proteinLength} ${circumference}`}
+                              strokeDashoffset={-carbsLength}
+                              strokeLinecap="round"
+                            />
+
+                            {/* 지방 */}
+                            <circle
+                              cx={size / 2}
+                              cy={size / 2}
+                              r={radius}
+                              fill="none"
+                              stroke="#bdb2ff"
+                              strokeWidth={strokeWidth}
+                              strokeDasharray={`${fatLength} ${circumference}`}
+                              strokeDashoffset={-(carbsLength + proteinLength)}
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        );
+                      })()}
+                    </div>
+
+                    {/* 범례 */}
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-pastel-breakfast flex-shrink-0"></div>
+                        <span className="text-sm text-text-secondary">탄수화물</span>
+                        <span className="text-sm font-medium text-text-primary ml-auto">
+                          {Math.round((currentDiary.totalNutrition.carbs /
                             (currentDiary.totalNutrition.carbs +
-                              currentDiary.totalNutrition.protein +
-                              currentDiary.totalNutrition.fat)) *
-                          100
-                        }%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-text-secondary">단백질</span>
-                    <span className="text-text-primary font-medium">
-                      {currentDiary.totalNutrition.protein}g
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-pastel-lunch rounded-full"
-                      style={{
-                        width: `${
-                          (currentDiary.totalNutrition.protein /
+                             currentDiary.totalNutrition.protein +
+                             currentDiary.totalNutrition.fat)) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-pastel-lunch flex-shrink-0"></div>
+                        <span className="text-sm text-text-secondary">단백질</span>
+                        <span className="text-sm font-medium text-text-primary ml-auto">
+                          {Math.round((currentDiary.totalNutrition.protein /
                             (currentDiary.totalNutrition.carbs +
-                              currentDiary.totalNutrition.protein +
-                              currentDiary.totalNutrition.fat)) *
-                          100
-                        }%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-text-secondary">지방</span>
-                    <span className="text-text-primary font-medium">
-                      {currentDiary.totalNutrition.fat}g
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-pastel-dinner rounded-full"
-                      style={{
-                        width: `${
-                          (currentDiary.totalNutrition.fat /
+                             currentDiary.totalNutrition.protein +
+                             currentDiary.totalNutrition.fat)) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-pastel-dinner flex-shrink-0"></div>
+                        <span className="text-sm text-text-secondary">지방</span>
+                        <span className="text-sm font-medium text-text-primary ml-auto">
+                          {Math.round((currentDiary.totalNutrition.fat /
                             (currentDiary.totalNutrition.carbs +
-                              currentDiary.totalNutrition.protein +
-                              currentDiary.totalNutrition.fat)) *
-                          100
-                        }%`,
-                      }}
-                    ></div>
+                             currentDiary.totalNutrition.protein +
+                             currentDiary.totalNutrition.fat)) * 100)}%
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </Card>
+                </Card>
 
-            {/* 음식 목록 */}
-            <div>
-              <h3 className="text-base font-semibold text-text-primary mb-3">
-                음식 목록
-              </h3>
-              <div className="space-y-2">
-                {currentDiary.foods.map((food, index) => (
-                  <Card key={index} variant="default" padding="md">
-                    <div className="flex items-center justify-between">
-                      <div>
+                {/* 음식 목록 */}
+                <div>
+                  <h3 className="text-base font-semibold text-text-primary mb-3">
+                    음식 목록
+                  </h3>
+                  <div className="space-y-2">
+                    {currentDiary.foods.map((food, index) => (
+                      <Card key={index} variant="default" padding="md">
                         <p className="text-sm font-medium text-text-primary">
                           {food.name}
                         </p>
-                        <p className="text-xs text-text-tertiary mt-0.5">
-                          탄 {food.nutrition.carbs}g · 단 {food.nutrition.protein}g · 지{' '}
-                          {food.nutrition.fat}g
-                        </p>
-                      </div>
-                      <div className="text-sm font-semibold text-text-primary">
-                        {food.calories}kcal
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
 
+                {/* 구분선 (마지막 항목 제외) */}
+                {diaryIndex < currentDiaries.length - 1 && (
+                  <div className="mt-6 pt-6 border-t border-border"></div>
+                )}
+              </div>
+            ))}
           </div>
         ) : (
           <div className="px-6 py-8 text-center">

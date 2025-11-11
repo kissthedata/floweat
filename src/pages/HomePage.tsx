@@ -165,6 +165,84 @@ export default function HomePage() {
             )}
           </div>
         </div>
+
+        {/* 예시 사진 다운로드 섹션 */}
+        <div className="mt-10">
+          <div className="text-center mb-4">
+            <h2 className="text-lg font-semibold text-text-primary mb-2">
+              지금 한 끼 사진이 없나요?
+            </h2>
+            <p className="text-sm text-text-secondary">
+              아래 사진을 다운해서 올려보세요!
+            </p>
+          </div>
+
+          <Card variant="default" padding="lg" className="mb-4">
+            <img
+              src="/examples/sample-meal.jpg"
+              alt="예시 음식 사진"
+              className="w-full h-48 object-cover rounded-lg mb-4"
+              onError={(e) => {
+                // 이미지 로드 실패 시 placeholder
+                e.currentTarget.src = 'https://via.placeholder.com/400x300/d4fdc8/4ae523?text=Sample+Meal';
+              }}
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = '/examples/sample-meal.jpg';
+                  link.download = 'sample-meal.jpg';
+                  link.click();
+                }}
+                className="flex-1 h-14 bg-surface text-text-primary font-semibold rounded-xl hover:bg-gray-100 transition-colors"
+              >
+                다운로드
+              </button>
+              <button
+                onClick={() => {
+                  // 예시 이미지를 base64로 변환하여 GoalPage로 이동
+                  fetch('/examples/sample-meal.jpg')
+                    .then(res => res.blob())
+                    .then(blob => {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        navigate('/goal', { state: { imageUrl: reader.result as string } });
+                      };
+                      reader.readAsDataURL(blob);
+                    })
+                    .catch(() => {
+                      // placeholder 사용
+                      navigate('/goal', {
+                        state: { imageUrl: 'https://via.placeholder.com/400x300/d4fdc8/4ae523?text=Sample+Meal' }
+                      });
+                    });
+                }}
+                className="flex-1 h-14 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors"
+              >
+                바로 시작
+              </button>
+            </div>
+          </Card>
+        </div>
+
+        {/* 설문조사 섹션 */}
+        <div className="mt-10">
+          <Card variant="default" padding="lg" className="text-center">
+            <h2 className="text-lg font-semibold text-text-primary mb-3">
+              플로잇 사용 경험을 알려주세요!
+            </h2>
+            <p className="text-sm text-text-secondary mb-6">
+              여러분의 소중한 의견이 서비스 개선에 큰 도움이 됩니다
+            </p>
+            <button
+              onClick={() => navigate('/survey')}
+              className="w-full h-14 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors"
+            >
+              설문하기
+            </button>
+          </Card>
+        </div>
       </div>
     </div>
   );

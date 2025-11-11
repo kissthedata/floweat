@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import GoalPage from './pages/GoalPage';
 import ResultPage from './pages/ResultPage';
 import DiaryPage from './pages/DiaryPage';
+import SurveyPage from './pages/SurveyPage';
 import MainLayout from './components/layout/MainLayout';
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
             {/* 풀스크린 페이지들 (탭바 없음) */}
             <Route path="/goal" element={<GoalPage />} />
             <Route path="/result" element={<ResultPage />} />
+            <Route path="/survey" element={<SurveyPage />} />
           </Routes>
         </div>
       </Router>

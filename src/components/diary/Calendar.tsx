@@ -8,7 +8,12 @@ import {
   getNextMonth,
   formatDateKey,
 } from '../../utils/dateUtils';
-import { getDiariesByMonth, getMealTimesByDate } from '../../services/supabaseService';
+import {
+  getDiariesByMonth,
+  getMealTimesByDate,
+  getCachedCalendarData,
+  setCachedCalendarData,
+} from '../../services/supabaseService';
 
 interface CalendarProps {
   onDateClick: (date: Date, meals: MealTime[]) => void;
@@ -20,12 +25,27 @@ export default function Calendar({ onDateClick }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [dates, setDates] = useState<CalendarDate[]>([]);
   const [mealsByDate, setMealsByDate] = useState<Map<string, MealTime[]>>(new Map());
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 월별 데이터 로드
+  // 월별 데이터 로드 (캐시 우선)
   useEffect(() => {
     async function loadMonthData() {
+      setIsLoading(true);
       const monthDates = generateMonthDates(currentYear, currentMonth);
-      const diaries = await getDiariesByMonth(currentYear, currentMonth);
+
+      // 1. 캐시 확인
+      const cachedDiaries = await getCachedCalendarData(currentYear, currentMonth);
+
+      let diaries;
+      if (cachedDiaries) {
+        // 캐시 있음: 즉시 사용 (스켈레톤 스킵)
+        diaries = cachedDiaries;
+      } else {
+        // 캐시 없음: DB에서 로드 후 캐시 저장
+        diaries = await getDiariesByMonth(currentYear, currentMonth);
+        await setCachedCalendarData(currentYear, currentMonth, diaries);
+      }
+
       const mealsMap = getMealTimesByDate(diaries);
 
       // 각 날짜에 식사 정보 추가
@@ -37,6 +57,7 @@ export default function Calendar({ onDateClick }: CalendarProps) {
 
       setDates(updatedDates);
       setMealsByDate(mealsMap);
+      setIsLoading(false);
     }
     loadMonthData();
   }, [currentYear, currentMonth]);
@@ -129,59 +150,71 @@ export default function Calendar({ onDateClick }: CalendarProps) {
         ))}
       </div>
 
-      {/* 날짜 그리드 */}
-      <div className="grid grid-cols-7 gap-1">
-        {dates.map((date, index) => {
-          const isToday = date.isToday;
-          const hasMeals = date.meals.length > 0;
-          const isClickable = date.isCurrentMonth && hasMeals;
-
-          return (
-            <button
+      {/* 로딩 중: 스켈레톤 UI */}
+      {isLoading ? (
+        <div className="grid grid-cols-7 gap-1">
+          {Array.from({ length: 35 }).map((_, index) => (
+            <div
               key={index}
-              onClick={() => handleDateClick(date)}
-              disabled={!isClickable}
-              className={`
-                aspect-square relative rounded-lg p-1 transition-all duration-200
-                ${
-                  date.isCurrentMonth
-                    ? 'text-text-primary'
-                    : 'text-text-tertiary opacity-40'
-                }
-                ${isToday ? 'bg-primary-light' : ''}
-                ${
-                  isClickable
-                    ? 'hover:bg-surface hover:scale-105 cursor-pointer active:scale-95'
-                    : ''
-                }
-                ${!date.isCurrentMonth ? 'cursor-default' : ''}
-              `}
-            >
-              {/* 날짜 숫자 */}
-              <div
-                className={`
-                text-sm font-medium mb-0.5
-                ${isToday ? 'text-primary font-semibold' : ''}
-              `}
-              >
-                {date.day}
-              </div>
+              className="aspect-square rounded-lg bg-gray-200 animate-pulse"
+            />
+          ))}
+        </div>
+      ) : (
+        /* 날짜 그리드 */
+        <div className="grid grid-cols-7 gap-1">
+          {dates.map((date, index) => {
+            const isToday = date.isToday;
+            const hasMeals = date.meals.length > 0;
+            const isClickable = date.isCurrentMonth && hasMeals;
 
-              {/* 식사 인디케이터 (작은 닷) */}
-              {hasMeals && date.isCurrentMonth && (
-                <div className="flex items-center justify-center gap-0.5">
-                  {date.meals.slice(0, 3).map((mealTime, idx) => (
-                    <div
-                      key={idx}
-                      className={`w-1.5 h-1.5 rounded-full ${getMealColor(mealTime)}`}
-                    />
-                  ))}
+            return (
+              <button
+                key={index}
+                onClick={() => handleDateClick(date)}
+                disabled={!isClickable}
+                className={`
+                  aspect-square relative rounded-lg p-1 transition-all duration-200
+                  ${
+                    date.isCurrentMonth
+                      ? 'text-text-primary'
+                      : 'text-text-tertiary opacity-40'
+                  }
+                  ${isToday ? 'bg-primary-light' : ''}
+                  ${
+                    isClickable
+                      ? 'hover:bg-surface hover:scale-105 cursor-pointer active:scale-95'
+                      : ''
+                  }
+                  ${!date.isCurrentMonth ? 'cursor-default' : ''}
+                `}
+              >
+                {/* 날짜 숫자 */}
+                <div
+                  className={`
+                  text-sm font-medium mb-0.5
+                  ${isToday ? 'text-primary font-semibold' : ''}
+                `}
+                >
+                  {date.day}
                 </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+
+                {/* 식사 인디케이터 (작은 닷) */}
+                {hasMeals && date.isCurrentMonth && (
+                  <div className="flex items-center justify-center gap-0.5">
+                    {date.meals.slice(0, 3).map((mealTime, idx) => (
+                      <div
+                        key={idx}
+                        className={`w-1.5 h-1.5 rounded-full ${getMealColor(mealTime)}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

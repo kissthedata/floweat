@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Calendar, DayDetailModal } from '../components/diary';
 import { Card } from '../components/common';
 import { getMonthlyStats, getAllDiaries } from '../services/supabaseService';
-import { clearAllDiaries } from '../utils/sampleData';
 import type { MealTime } from '../types';
 
 export default function DiaryPage() {
@@ -38,11 +37,8 @@ export default function DiaryPage() {
     setTimeout(() => setSelectedDate(null), 300);
   };
 
-  const handleClearAll = async () => {
-    if (window.confirm('모든 식단 기록을 삭제하시겠습니까?')) {
-      await clearAllDiaries();
-      setRefreshKey(prev => prev + 1);
-    }
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
   };
 
   return (
@@ -54,17 +50,6 @@ export default function DiaryPage() {
       </div>
 
       <div className="page-content">
-        {hasDiaries && (
-          <div className="mb-6">
-            <button
-              onClick={handleClearAll}
-              className="text-xs text-text-tertiary hover:text-text-secondary transition-colors"
-            >
-              🗑️ 모든 기록 삭제
-            </button>
-          </div>
-        )}
-
         {/* 캘린더 */}
         <Card variant="default" padding="lg">
           <Calendar key={refreshKey} onDateClick={handleDateClick} />
@@ -72,7 +57,13 @@ export default function DiaryPage() {
       </div>
 
       {/* 날짜 상세 모달 */}
-      {isModalOpen && <DayDetailModal date={selectedDate} onClose={handleCloseModal} />}
+      {isModalOpen && (
+        <DayDetailModal
+          date={selectedDate}
+          onClose={handleCloseModal}
+          onRefresh={handleRefresh}
+        />
+      )}
     </div>
   );
 }

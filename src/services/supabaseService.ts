@@ -178,11 +178,45 @@ export async function getDiaryByDateAndMealTime(
  * 특정 월의 식단 기록 가져오기
  */
 export async function getDiariesByMonth(year: number, month: number): Promise<FoodDiary[]> {
-  const allDiaries = await getAllDiaries();
-  return allDiaries.filter((diary) => {
-    const diaryDate = new Date(diary.timestamp);
-    return diaryDate.getFullYear() === year && diaryDate.getMonth() === month;
-  });
+  try {
+    // 월의 시작과 끝 계산
+    const startOfMonth = new Date(year, month, 1).toISOString();
+    const startOfNextMonth = new Date(year, month + 1, 1).toISOString();
+
+    // 월별로 직접 필터링된 쿼리
+    const { data: diaries, error: diariesError } = await supabase
+      .from('food_diaries')
+      .select('*')
+      .gte('created_at', startOfMonth)
+      .lt('created_at', startOfNextMonth)
+      .order('created_at', { ascending: false });
+
+    if (diariesError) throw diariesError;
+    if (!diaries || diaries.length === 0) return [];
+
+    // foods와 eating_order_steps 가져오기
+    const diaryIds = diaries.map((d) => d.id);
+
+    const { data: foods, error: foodsError } = await supabase
+      .from('foods')
+      .select('*')
+      .in('diary_id', diaryIds);
+
+    const { data: steps, error: stepsError } = await supabase
+      .from('eating_order_steps')
+      .select('*')
+      .in('diary_id', diaryIds)
+      .order('order_number', { ascending: true });
+
+    if (foodsError) throw foodsError;
+    if (stepsError) throw stepsError;
+
+    // DB 데이터를 TypeScript 타입으로 변환
+    return diaries.map((diary) => convertDbToFoodDiary(diary, foods || [], steps || []));
+  } catch (error) {
+    console.error('Failed to load diaries by month:', error);
+    return [];
+  }
 }
 
 /**
@@ -267,19 +301,6 @@ export async function getMonthlyStats(year: number, month: number) {
 }
 
 /**
- * 모든 식단 기록 삭제 (테스트용)
- */
-export async function clearAllDiaries(): Promise<void> {
-  try {
-    const { error } = await supabase.from('food_diaries').delete().gte('created_at', '1970-01-01');
-
-    if (error) throw error;
-  } catch (error) {
-    console.error('Failed to clear diaries:', error);
-  }
-}
-
-/**
  * DB 데이터를 TypeScript FoodDiary 타입으로 변환
  */
 function convertDbToFoodDiary(
@@ -314,4 +335,134 @@ function convertDbToFoodDiary(
     timestamp: new Date(dbDiary.created_at).getTime(),
     userFeedback: dbDiary.user_feedback || undefined,
   };
+}
+
+/**
+ * 캘린더 캐시 조회
+ */
+export async function getCachedCalendarData(
+  year: number,
+  month: number
+): Promise<FoodDiary[] | null> {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const cacheKey = `${year}-${month}`;
+
+    const { data, error } = await supabase
+      .from('calendar_cache')
+      .select('data, expires_at')
+      .eq('user_id', user.id)
+      .eq('cache_key', cacheKey)
+      .single();
+
+    if (error || !data) return null;
+
+    // 캐시 만료 확인
+    const now = new Date();
+    const expiresAt = new Date(data.expires_at);
+
+    if (now > expiresAt) {
+      // 만료된 캐시 삭제
+      await supabase
+        .from('calendar_cache')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('cache_key', cacheKey);
+      return null;
+    }
+
+    // 캐시된 데이터 반환
+    return data.data as FoodDiary[];
+  } catch (error) {
+    console.error('Failed to get cached calendar data:', error);
+    return null;
+  }
+}
+
+/**
+ * 캘린더 캐시 저장
+ */
+export async function setCachedCalendarData(
+  year: number,
+  month: number,
+  diaries: FoodDiary[]
+): Promise<void> {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const cacheKey = `${year}-${month}`;
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 30); // 30분 TTL
+
+    // Upsert: 존재하면 업데이트, 없으면 생성
+    const { error } = await supabase
+      .from('calendar_cache')
+      .upsert(
+        {
+          user_id: user.id,
+          cache_key: cacheKey,
+          data: diaries,
+          expires_at: expiresAt.toISOString(),
+        },
+        {
+          onConflict: 'user_id,cache_key',
+        }
+      );
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Failed to set cached calendar data:', error);
+  }
+}
+
+/**
+ * 특정 월의 캐시 무효화
+ */
+export async function invalidateCalendarCache(year: number, month: number): Promise<void> {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const cacheKey = `${year}-${month}`;
+
+    const { error } = await supabase
+      .from('calendar_cache')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('cache_key', cacheKey);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Failed to invalidate calendar cache:', error);
+  }
+}
+
+/**
+ * 모든 캘린더 캐시 무효화
+ */
+export async function invalidateAllCalendarCache(): Promise<void> {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('calendar_cache')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Failed to invalidate all calendar cache:', error);
+  }
 }
