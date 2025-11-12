@@ -65,7 +65,7 @@ export default function HomePage() {
         <h1 className="text-[26px] font-bold text-text-primary mb-8 leading-[1.4]">
           어떤 음식을 드세요?
           <br />
-          플로잇이 순서를 알려드릴게요!
+          먹는 순서 알려드릴게요!
         </h1>
 
         <input
@@ -173,7 +173,7 @@ export default function HomePage() {
               지금 한 끼 사진이 없나요?
             </h2>
             <p className="text-sm text-text-secondary">
-              아래 사진을 다운해서 올려보세요!
+              아래 사진을 다운로드 또는 바로 시작해보세요!
             </p>
           </div>
 
@@ -181,7 +181,7 @@ export default function HomePage() {
             <img
               src="/examples/sample-meal.jpg"
               alt="예시 음식 사진"
-              className="w-full h-48 object-cover rounded-lg mb-4"
+              className="w-full h-auto object-contain rounded-lg mb-4"
               onError={(e) => {
                 // 이미지 로드 실패 시 placeholder
                 e.currentTarget.src = 'https://via.placeholder.com/400x300/d4fdc8/4ae523?text=Sample+Meal';
