@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Button, Card } from '../components/common';
+import Spinner from '../components/common/Spinner';
 import { FoodDetectionImage } from '../components/result';
 import { saveDiary, invalidateCalendarCache } from '../services/supabaseService';
 import { detectFoodsFromImage, analyzeNutritionAndOrder } from '../services/openai';
@@ -22,6 +23,8 @@ export default function ResultPage() {
   const [error, setError] = useState<string | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Phase 1: 음식 감지
   useEffect(() => {
@@ -99,26 +102,40 @@ export default function ResultPage() {
 
   // 기록 저장
   const handleSaveDiary = async () => {
-    if (!finalAnalysis) return;
+    if (!finalAnalysis || isSaving) return; // 중복 클릭 방지
 
-    const diary: Omit<FoodDiary, 'id'> = {
-      mealTime: selectedMealTime,
-      imageUrl: finalAnalysis.imageUrl,
-      foods: finalAnalysis.foods,
-      totalNutrition: finalAnalysis.totalNutrition,
-      eatingOrder: finalAnalysis.eatingOrder,
-      timestamp: finalAnalysis.timestamp,
-    };
+    setIsSaving(true);
+    setSaveError(null);
 
-    await saveDiary(diary);
+    try {
+      const diary: Omit<FoodDiary, 'id'> = {
+        mealTime: selectedMealTime,
+        imageUrl: finalAnalysis.imageUrl,
+        foods: finalAnalysis.foods,
+        totalNutrition: finalAnalysis.totalNutrition,
+        eatingOrder: finalAnalysis.eatingOrder,
+        timestamp: finalAnalysis.timestamp,
+      };
 
-    // 캐시 무효화 (저장된 diary의 월)
-    const savedDate = new Date(finalAnalysis.timestamp);
-    const year = savedDate.getFullYear();
-    const month = savedDate.getMonth();
-    await invalidateCalendarCache(year, month);
+      const result = await saveDiary(diary);
 
-    navigate('/');
+      if (!result) {
+        throw new Error('기록 저장에 실패했습니다.');
+      }
+
+      // 캐시 무효화 (저장된 diary의 월)
+      const savedDate = new Date(finalAnalysis.timestamp);
+      const year = savedDate.getFullYear();
+      const month = savedDate.getMonth();
+      await invalidateCalendarCache(year, month);
+
+      navigate('/');
+    } catch (err) {
+      console.error('Failed to save diary:', err);
+      setSaveError('기록 저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const mealTimeOptions = [
@@ -512,8 +529,20 @@ export default function ResultPage() {
 
         {/* 기록하기 버튼 */}
         <div className="page-bottom">
-          <Button fullWidth onClick={handleSaveDiary}>
-            기록하기
+          {saveError && (
+            <div className="mb-3 p-3 bg-red-50 rounded-xl text-sm text-red-600">
+              {saveError}
+            </div>
+          )}
+          <Button fullWidth onClick={handleSaveDiary} disabled={isSaving}>
+            {isSaving ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner size="sm" color="#ffffff" />
+                저장 중...
+              </span>
+            ) : (
+              '기록하기'
+            )}
           </Button>
         </div>
       </div>

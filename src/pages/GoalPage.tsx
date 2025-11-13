@@ -3,21 +3,36 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Card } from '../components/common';
 import type { EatingGoal } from '../types';
 
-const GOALS: { id: EatingGoal; name: string; description: string }[] = [
+const GOALS: { id: EatingGoal; name: string; description: string; emoji: string }[] = [
   {
     id: 'digestion',
     name: '소화 편안',
     description: '편안한 소화를 위한 순서',
+    emoji: '🌿',
   },
   {
     id: 'satiety',
     name: '포만감 유지',
     description: '오래 지속되는 포만감',
+    emoji: '💪',
   },
   {
     id: 'energy',
     name: '졸림 방지',
     description: '식후 피로를 줄이는 방법',
+    emoji: '⚡',
+  },
+  {
+    id: 'muscle',
+    name: '근육 생성',
+    description: '단백질 흡수를 높이는 순서',
+    emoji: '🏋️',
+  },
+  {
+    id: 'skin',
+    name: '피부 건강',
+    description: '항산화 영양소 섭취 최적화',
+    emoji: '✨',
   },
 ];
 
@@ -90,13 +105,16 @@ export default function GoalPage() {
                     <div className="w-3 h-3 bg-white rounded-full"></div>
                   )}
                 </div>
-                <div>
-                  <h3 className="text-base font-medium text-text-primary">
-                    {goal.name}
-                  </h3>
-                  <p className="text-sm text-text-secondary mt-1">
-                    {goal.description}
-                  </p>
+                <div className="flex items-center gap-2 flex-1">
+                  <span className="text-2xl">{goal.emoji}</span>
+                  <div>
+                    <h3 className="text-base font-medium text-text-primary">
+                      {goal.name}
+                    </h3>
+                    <p className="text-sm text-text-secondary mt-1">
+                      {goal.description}
+                    </p>
+                  </div>
                 </div>
               </div>
             </Card>

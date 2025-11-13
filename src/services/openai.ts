@@ -109,12 +109,16 @@ export async function analyzeNutritionAndOrder(
     digestion: '소화가 편안하도록',
     satiety: '포만감이 오래 유지되도록',
     energy: '식후 졸림과 피로를 방지하도록',
+    muscle: '단백질 흡수를 높이고 근육 생성을 촉진하도록',
+    skin: '항산화 효과를 높이고 피부 건강을 개선하도록',
   };
 
   const goalNames = {
     digestion: '소화 편안',
     satiety: '포만감 유지',
     energy: '졸림 방지',
+    muscle: '근육 생성',
+    skin: '피부 건강',
   };
 
   const foodList = foods.map(f => `${f.name}(${f.category})`).join(', ');
@@ -260,6 +264,8 @@ export async function analyzeFoodImage(
     digestion: '소화가 편안하도록',
     satiety: '포만감이 오래 유지되도록',
     energy: '식후 졸림과 피로를 방지하도록',
+    muscle: '단백질 흡수를 높이고 근육 생성을 촉진하도록',
+    skin: '항산화 효과를 높이고 피부 건강을 개선하도록',
   };
 
   const prompt = `당신은 영양 전문가입니다. 이 음식 사진을 분석하여 다음 정보를 JSON 형식으로 제공해주세요:
@@ -381,6 +387,8 @@ export async function analyzeFoodImage(
       digestion: '소화 편안',
       satiety: '포만감 유지',
       energy: '졸림 방지',
+      muscle: '근육 생성',
+      skin: '피부 건강',
     };
 
     return {

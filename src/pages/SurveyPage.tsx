@@ -15,8 +15,14 @@ interface SurveyAnswers {
   q8?: number; // 사진 인식 속도 만족도 (1-5)
   q9?: string[]; // 불편했던 점 (다중 선택)
   q9Other?: string; // Q9 기타 입력
-  q10?: string; // 재사용 상황 (단일 선택)
+  q10?: string[]; // 재사용 상황 (다중 선택)
   q10Other?: string; // Q10 기타 입력
+  gender?: string; // 성별
+  ageRange?: string; // 연령대
+  occupation?: string; // 직업
+  wantsNotification?: boolean; // 출시 알림 수신 여부
+  contactEmail?: string; // 연락 이메일
+  contactPhone?: string; // 연락 전화번호
 }
 
 export default function SurveyPage() {
@@ -29,7 +35,7 @@ export default function SurveyPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const totalSteps = 11; // Q0-Q10
+  const totalSteps = 13; // Q0-Q12
   const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const nextStep = () => {
@@ -72,6 +78,12 @@ export default function SurveyPage() {
         q9_other: answers.q9Other || null,
         q10: answers.q10 || null,
         q10_other: answers.q10Other || null,
+        gender: answers.gender || null,
+        age_range: answers.ageRange || null,
+        occupation: answers.occupation || null,
+        wants_launch_notification: answers.wantsNotification || false,
+        contact_email: answers.contactEmail || null,
+        contact_phone: answers.contactPhone || null,
       };
 
       console.log('설문 결과 저장 중:', surveyData);
@@ -655,89 +667,121 @@ export default function SurveyPage() {
         return (
           <QuestionBox
             title="FLOW:EAT을"
-            subtitle="어떤 상황에서 다시 사용할 것 같나요?"
+            subtitle="어떤 상황에서 다시 사용할 것 같나요? (복수선택 가능)"
           >
-            <OptionButton
-              selected={answers.q10 === '출근/직장 점심'}
+            <CheckboxButton
+              checked={answers.q10?.includes('출근/직장 점심') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '출근/직장 점심' }));
-                setShowQ10OtherInput(false);
+                const current = answers.q10 || [];
+                const newValue = current.includes('출근/직장 점심')
+                  ? current.filter((v) => v !== '출근/직장 점심')
+                  : [...current, '출근/직장 점심'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
               }}
             >
               출근/직장 점심
-            </OptionButton>
-            <OptionButton
-              selected={answers.q10 === '학교·공부 중 식사'}
+            </CheckboxButton>
+            <CheckboxButton
+              checked={answers.q10?.includes('학교·공부 중 식사') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '학교·공부 중 식사' }));
-                setShowQ10OtherInput(false);
+                const current = answers.q10 || [];
+                const newValue = current.includes('학교·공부 중 식사')
+                  ? current.filter((v) => v !== '학교·공부 중 식사')
+                  : [...current, '학교·공부 중 식사'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
               }}
             >
               학교·공부 중 식사
-            </OptionButton>
-            <OptionButton
-              selected={answers.q10 === '외식/식당'}
+            </CheckboxButton>
+            <CheckboxButton
+              checked={answers.q10?.includes('외식/식당') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '외식/식당' }));
-                setShowQ10OtherInput(false);
+                const current = answers.q10 || [];
+                const newValue = current.includes('외식/식당')
+                  ? current.filter((v) => v !== '외식/식당')
+                  : [...current, '외식/식당'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
               }}
             >
               외식/식당
-            </OptionButton>
-            <OptionButton
-              selected={answers.q10 === '다이어트 중일 때'}
+            </CheckboxButton>
+            <CheckboxButton
+              checked={answers.q10?.includes('다이어트 중일 때') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '다이어트 중일 때' }));
-                setShowQ10OtherInput(false);
+                const current = answers.q10 || [];
+                const newValue = current.includes('다이어트 중일 때')
+                  ? current.filter((v) => v !== '다이어트 중일 때')
+                  : [...current, '다이어트 중일 때'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
               }}
             >
               다이어트 중일 때
-            </OptionButton>
-            <OptionButton
-              selected={answers.q10 === '소화·가스·더부룩함 있을 때'}
+            </CheckboxButton>
+            <CheckboxButton
+              checked={answers.q10?.includes('소화·가스·더부룩함 있을 때') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '소화·가스·더부룩함 있을 때' }));
-                setShowQ10OtherInput(false);
+                const current = answers.q10 || [];
+                const newValue = current.includes('소화·가스·더부룩함 있을 때')
+                  ? current.filter((v) => v !== '소화·가스·더부룩함 있을 때')
+                  : [...current, '소화·가스·더부룩함 있을 때'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
               }}
             >
               소화·가스·더부룩함 있을 때
-            </OptionButton>
-            <OptionButton
-              selected={answers.q10 === '늦은 밤 식사'}
+            </CheckboxButton>
+            <CheckboxButton
+              checked={answers.q10?.includes('늦은 밤 식사') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '늦은 밤 식사' }));
-                setShowQ10OtherInput(false);
+                const current = answers.q10 || [];
+                const newValue = current.includes('늦은 밤 식사')
+                  ? current.filter((v) => v !== '늦은 밤 식사')
+                  : [...current, '늦은 밤 식사'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
               }}
             >
               늦은 밤 식사
-            </OptionButton>
-            <OptionButton
-              selected={answers.q10 === '아무 때나'}
+            </CheckboxButton>
+            <CheckboxButton
+              checked={answers.q10?.includes('아무 때나') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '아무 때나' }));
-                setShowQ10OtherInput(false);
+                const current = answers.q10 || [];
+                const newValue = current.includes('아무 때나')
+                  ? current.filter((v) => v !== '아무 때나')
+                  : [...current, '아무 때나'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
               }}
             >
               아무 때나
-            </OptionButton>
-            <OptionButton
-              selected={answers.q10 === '다시 사용할 것 같지 않음'}
+            </CheckboxButton>
+            <CheckboxButton
+              checked={answers.q10?.includes('다시 사용할 것 같지 않음') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '다시 사용할 것 같지 않음' }));
-                setShowQ10OtherInput(false);
+                const current = answers.q10 || [];
+                const newValue = current.includes('다시 사용할 것 같지 않음')
+                  ? current.filter((v) => v !== '다시 사용할 것 같지 않음')
+                  : [...current, '다시 사용할 것 같지 않음'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
               }}
             >
               다시 사용할 것 같지 않음
-            </OptionButton>
-            <OptionButton
-              selected={answers.q10 === '기타'}
+            </CheckboxButton>
+            <CheckboxButton
+              checked={answers.q10?.includes('기타') || false}
               onClick={() => {
-                setAnswers((prev) => ({ ...prev, q10: '기타' }));
-                setShowQ10OtherInput(true);
+                const current = answers.q10 || [];
+                const isChecked = current.includes('기타');
+                const newValue = isChecked
+                  ? current.filter((v) => v !== '기타')
+                  : [...current, '기타'];
+                setAnswers((prev) => ({ ...prev, q10: newValue }));
+                setShowQ10OtherInput(!isChecked);
+                if (isChecked) {
+                  setAnswers((prev) => ({ ...prev, q10Other: '' }));
+                }
               }}
             >
               기타
-            </OptionButton>
+            </CheckboxButton>
             {showQ10OtherInput && (
               <textarea
                 value={answers.q10Other || ''}
@@ -746,21 +790,216 @@ export default function SurveyPage() {
                 className="w-full h-24 p-4 border-2 border-border rounded-xl resize-none focus:border-primary focus:outline-none text-text-primary mt-2"
               />
             )}
-            {submitError && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{submitError}</p>
-              </div>
-            )}
             <NavigationButtons
-              onNext={handleSubmit}
+              onNext={nextStep}
               onPrev={prevStep}
-              nextDisabled={!answers.q10 || isSubmitting}
-              nextLabel={isSubmitting ? '저장 중...' : '제출'}
+              nextDisabled={!answers.q10 || answers.q10.length === 0}
             />
           </QuestionBox>
         );
 
       case 11:
+        return (
+          <QuestionBox
+            title="마지막으로 간단한 정보를"
+            subtitle="알려주세요"
+          >
+            <div className="space-y-6">
+              {/* 성별 */}
+              <div>
+                <h3 className="text-sm font-medium text-text-primary mb-3">성별</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <CompactRadioButton
+                    selected={answers.gender === '남성'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, gender: '남성' }))}
+                  >
+                    남성
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.gender === '여성'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, gender: '여성' }))}
+                  >
+                    여성
+                  </CompactRadioButton>
+                </div>
+              </div>
+
+              {/* 연령대 */}
+              <div>
+                <h3 className="text-sm font-medium text-text-primary mb-3">연령대</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  <CompactRadioButton
+                    selected={answers.ageRange === '10대'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, ageRange: '10대' }))}
+                  >
+                    10대
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.ageRange === '20대'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, ageRange: '20대' }))}
+                  >
+                    20대
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.ageRange === '30대'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, ageRange: '30대' }))}
+                  >
+                    30대
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.ageRange === '40대'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, ageRange: '40대' }))}
+                  >
+                    40대
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.ageRange === '50대'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, ageRange: '50대' }))}
+                  >
+                    50대
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.ageRange === '60대 이상'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, ageRange: '60대 이상' }))}
+                  >
+                    60대 이상
+                  </CompactRadioButton>
+                </div>
+              </div>
+
+              {/* 직업 */}
+              <div>
+                <h3 className="text-sm font-medium text-text-primary mb-3">직업</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <CompactRadioButton
+                    selected={answers.occupation === '학생'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, occupation: '학생' }))}
+                  >
+                    학생
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.occupation === '직장인'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, occupation: '직장인' }))}
+                  >
+                    직장인
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.occupation === '자영업'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, occupation: '자영업' }))}
+                  >
+                    자영업
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.occupation === '전문직'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, occupation: '전문직' }))}
+                  >
+                    전문직
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.occupation === '주부'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, occupation: '주부' }))}
+                  >
+                    주부
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.occupation === '무직'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, occupation: '무직' }))}
+                  >
+                    무직
+                  </CompactRadioButton>
+                  <CompactRadioButton
+                    selected={answers.occupation === '기타'}
+                    onClick={() => setAnswers((prev) => ({ ...prev, occupation: '기타' }))}
+                  >
+                    기타
+                  </CompactRadioButton>
+                </div>
+              </div>
+            </div>
+
+            <NavigationButtons
+              onNext={nextStep}
+              onPrev={prevStep}
+              nextDisabled={!answers.gender || !answers.ageRange || !answers.occupation}
+            />
+          </QuestionBox>
+        );
+
+      case 12:
+        return (
+          <QuestionBox
+            title="플로잇이 정식 출시한다면"
+            subtitle="알림을 받고 싶으신가요?"
+          >
+            <div className="space-y-4">
+              <CheckboxButton
+                checked={answers.wantsNotification || false}
+                onClick={() => {
+                  const newValue = !answers.wantsNotification;
+                  setAnswers((prev) => ({ ...prev, wantsNotification: newValue }));
+                  if (!newValue) {
+                    // 체크 해제 시 연락처 정보 초기화
+                    setAnswers((prev) => ({ ...prev, contactEmail: '', contactPhone: '' }));
+                  }
+                }}
+              >
+                네, 출시 소식을 받고 싶어요
+              </CheckboxButton>
+
+              {answers.wantsNotification && (
+                <div className="space-y-3 pt-2">
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-2">
+                      이메일 (선택)
+                    </label>
+                    <input
+                      type="email"
+                      value={answers.contactEmail || ''}
+                      onChange={(e) => setAnswers((prev) => ({ ...prev, contactEmail: e.target.value }))}
+                      placeholder="example@email.com"
+                      className="w-full h-12 px-4 border-2 border-border rounded-xl focus:border-primary focus:outline-none text-text-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-2">
+                      전화번호 (선택)
+                    </label>
+                    <input
+                      type="tel"
+                      value={answers.contactPhone || ''}
+                      onChange={(e) => setAnswers((prev) => ({ ...prev, contactPhone: e.target.value }))}
+                      placeholder="010-0000-0000"
+                      className="w-full h-12 px-4 border-2 border-border rounded-xl focus:border-primary focus:outline-none text-text-primary"
+                    />
+                  </div>
+                  {answers.wantsNotification && !answers.contactEmail && !answers.contactPhone && (
+                    <p className="text-xs text-red-600">
+                      이메일 또는 전화번호 중 하나를 입력해주세요
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {submitError && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{submitError}</p>
+              </div>
+            )}
+
+            <NavigationButtons
+              onNext={handleSubmit}
+              onPrev={prevStep}
+              nextDisabled={
+                isSubmitting ||
+                (answers.wantsNotification && !answers.contactEmail && !answers.contactPhone)
+              }
+              nextLabel={isSubmitting ? '저장 중...' : '제출'}
+            />
+          </QuestionBox>
+        );
+
+      case 13:
         return (
           <div className="max-w-lg mx-auto text-center">
             <div className="mb-8">
@@ -924,6 +1163,30 @@ function CheckboxButton({
     >
       <span>{children}</span>
       <span className="text-xl">{checked ? '✓' : ''}</span>
+    </button>
+  );
+}
+
+// 컴팩트 라디오 버튼 컴포넌트 (인구통계용)
+function CompactRadioButton({
+  children,
+  selected,
+  onClick,
+}: {
+  children: React.ReactNode;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`h-10 px-4 text-sm font-medium rounded-lg transition-all active:scale-95 ${
+        selected
+          ? 'bg-green-500 text-white'
+          : 'bg-surface text-text-primary hover:bg-gray-100'
+      }`}
+    >
+      {children}
     </button>
   );
 }
