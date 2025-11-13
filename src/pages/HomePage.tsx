@@ -2,13 +2,33 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/common';
 import { getRecentDiaries } from '../services/supabaseService';
+import { checkTutorialCompleted } from '../services/userPreferencesService';
+import { useAuth } from '../contexts/AuthContext';
 import type { FoodDiary } from '../types';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [recentMeals, setRecentMeals] = useState<FoodDiary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 튜토리얼 체크 및 자동 리다이렉트
+  useEffect(() => {
+    async function checkTutorial() {
+      if (authLoading || !user) return;
+
+      try {
+        const completed = await checkTutorialCompleted();
+        if (!completed) {
+          navigate('/tutorial');
+        }
+      } catch (error) {
+        console.error('Failed to check tutorial completion:', error);
+      }
+    }
+    checkTutorial();
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     async function loadRecentMeals() {
@@ -62,11 +82,21 @@ export default function HomePage() {
   return (
     <div className="page-container">
       <div className="page-content">
-        <h1 className="text-[26px] font-bold text-text-primary mb-8 leading-[1.4]">
-          어떤 음식을 드세요?
-          <br />
-          먹는 순서 알려드릴게요!
-        </h1>
+        {/* 헤더 영역 */}
+        <div className="flex items-start justify-between mb-8">
+          <h1 className="text-[26px] font-bold text-text-primary leading-[1.4] flex-1">
+            어떤 음식을 드세요?
+            <br />
+            먹는 순서 알려드릴게요!
+          </h1>
+          <button
+            onClick={() => navigate('/tutorial')}
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-surface hover:bg-gray-100 transition-colors"
+            aria-label="튜토리얼 다시보기"
+          >
+            <span className="text-xl text-text-secondary">?</span>
+          </button>
+        </div>
 
         <input
           ref={fileInputRef}
@@ -85,12 +115,12 @@ export default function HomePage() {
         >
           <div className="flex flex-col items-center justify-center gap-4 py-8">
             <img
-              src="/icons/camera-3d.png"
+              src="/icons/food.png"
               alt="사진 올리기"
               className="w-[120px] h-[120px] object-contain"
             />
             <p className="text-xl font-bold text-text-primary text-center">
-              내 한 끼 사진 올리기
+              내 한 끼 사진을 올려주세요!
             </p>
             <p className="text-sm text-text-secondary text-center">
               사진 촬영 또는 갤러리에서 선택

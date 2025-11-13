@@ -92,3 +92,13 @@ export interface MonthData {
   month: number;
   dates: CalendarDate[];
 }
+
+// 사용자 설정
+export interface UserPreferences {
+  id: string;
+  userId: string;
+  hasCompletedTutorial: boolean;
+  tutorialCompletedAt?: number;  // timestamp
+  createdAt: number;             // timestamp
+  updatedAt: number;             // timestamp
+}
