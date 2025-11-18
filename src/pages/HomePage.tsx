@@ -259,7 +259,7 @@ export default function HomePage() {
         {/* 설문조사 섹션 */}
         <div className="mt-10">
           <Card variant="default" padding="lg" className="text-center">
-            <img src='public/icons/clap.png' alt="설문조사" className="w-40 h-40 mx-auto mb-4" />
+            <img src='icons/clap.png' alt="설문조사" className="w-40 h-40 mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-text-primary mb-3">
               플로잇 사용 경험을 알려주세요!
             </h2>
