@@ -232,7 +232,7 @@ export default function ResultPage() {
         {!isConfirmed && (
           <div className="mb-6">
             <Button fullWidth onClick={handleConfirmFoods}>
-              음식 확인 완료 ✓
+              음식 확인 완료
             </Button>
           </div>
         )}

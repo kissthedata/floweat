@@ -34,6 +34,12 @@ const GOALS: { id: EatingGoal; name: string; description: string; emoji: string 
     description: '항산화 영양소 섭취 최적화',
     emoji: '✨',
   },
+  {
+    id: 'weight',
+    name: '체중 관리',
+    description: '혈당 조절로 체지방 증가 최소화',
+    emoji: '🎯',
+  },
 ];
 
 export default function GoalPage() {

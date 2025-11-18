@@ -60,6 +60,8 @@ export async function detectFoodsFromImage(
         ],
         max_tokens: 500,
         response_format: { type: 'json_object' },
+        temperature: 0,
+        seed: 42,
       }),
     });
 
@@ -111,6 +113,7 @@ export async function analyzeNutritionAndOrder(
     energy: '식후 졸림과 피로를 방지하도록',
     muscle: '단백질 흡수를 높이고 근육 생성을 촉진하도록',
     skin: '항산화 효과를 높이고 피부 건강을 개선하도록',
+    weight: '혈당 스파이크를 억제하고 체지방 증가를 최소화하도록',
   };
 
   const goalNames = {
@@ -119,6 +122,7 @@ export async function analyzeNutritionAndOrder(
     energy: '졸림 방지',
     muscle: '근육 생성',
     skin: '피부 건강',
+    weight: '체중 관리',
   };
 
   const foodList = foods.map(f => `${f.name}(${f.category})`).join(', ');
@@ -196,6 +200,8 @@ ${foodList}
         ],
         max_tokens: 2000,
         response_format: { type: 'json_object' },
+        temperature: 0,
+        seed: 42,
       }),
     });
 
@@ -266,6 +272,7 @@ export async function analyzeFoodImage(
     energy: '식후 졸림과 피로를 방지하도록',
     muscle: '단백질 흡수를 높이고 근육 생성을 촉진하도록',
     skin: '항산화 효과를 높이고 피부 건강을 개선하도록',
+    weight: '혈당 스파이크를 억제하고 체지방 증가를 최소화하도록',
   };
 
   const prompt = `당신은 영양 전문가입니다. 이 음식 사진을 분석하여 다음 정보를 JSON 형식으로 제공해주세요:
@@ -340,6 +347,8 @@ export async function analyzeFoodImage(
         ],
         max_tokens: 2000,
         response_format: { type: 'json_object' },
+        temperature: 0,
+        seed: 42,
       }),
     });
 
@@ -389,6 +398,7 @@ export async function analyzeFoodImage(
       energy: '졸림 방지',
       muscle: '근육 생성',
       skin: '피부 건강',
+      weight: '체중 관리',
     };
 
     return {

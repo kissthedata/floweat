@@ -12,7 +12,8 @@ export type EatingGoal =
   | 'satiety'        // 포만감 오래 유지
   | 'energy'         // 졸림/피로 방지
   | 'muscle'         // 근육 생성
-  | 'skin';          // 피부 건강
+  | 'skin'           // 피부 건강
+  | 'weight';        // 체중 관리
 
 // 식사 시간
 export type MealTime =

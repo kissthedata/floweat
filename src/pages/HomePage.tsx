@@ -2,33 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/common';
 import { getRecentDiaries } from '../services/supabaseService';
-import { checkTutorialCompleted } from '../services/userPreferencesService';
-import { useAuth } from '../contexts/AuthContext';
 import type { FoodDiary } from '../types';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
   const [recentMeals, setRecentMeals] = useState<FoodDiary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // 튜토리얼 체크 및 자동 리다이렉트
-  useEffect(() => {
-    async function checkTutorial() {
-      if (authLoading || !user) return;
-
-      try {
-        const completed = await checkTutorialCompleted();
-        if (!completed) {
-          navigate('/tutorial');
-        }
-      } catch (error) {
-        console.error('Failed to check tutorial completion:', error);
-      }
-    }
-    checkTutorial();
-  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     async function loadRecentMeals() {

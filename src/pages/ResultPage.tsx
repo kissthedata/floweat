@@ -156,10 +156,8 @@ export default function ResultPage() {
 
         <div className="page-content flex items-center justify-center">
           <div className="text-center">
-            <div className="loader-wrapper mx-auto mb-4" style={{ margin: '0 auto 1rem' }}>
-              <div className="loader"></div>
-            </div>
-            <p className="text-sm text-text-secondary">
+            <div className="loader"></div>
+            <p className="text-sm text-text-secondary mt-4">
               AI가 사진에서 음식을 찾고 있어요
             </p>
           </div>
@@ -242,7 +240,7 @@ export default function ResultPage() {
           {/* 확인 버튼 */}
           <div className="mb-6">
             <Button fullWidth onClick={handleConfirmFoods}>
-              음식 확인 완료 ✓
+              음식 확인 완료
             </Button>
           </div>
         </div>
@@ -296,10 +294,8 @@ export default function ResultPage() {
 
         <div className="page-content flex items-center justify-center">
           <div className="text-center">
-            <div className="loader-wrapper mx-auto mb-4" style={{ margin: '0 auto 1rem' }}>
-              <div className="loader"></div>
-            </div>
-            <p className="text-sm text-text-secondary">
+            <div className="loader"></div>
+            <p className="text-sm text-text-secondary mt-4">
               AI가 영양 정보와 먹는 순서를 계산하고 있어요
             </p>
           </div>
@@ -335,8 +331,8 @@ export default function ResultPage() {
                     flex-1 py-3 px-3 rounded-xl font-medium text-sm transition-all duration-200
                     ${
                       selectedMealTime === option.value
-                        ? `${option.color} text-text-primary shadow-sm border-2 border-primary`
-                        : 'bg-surface text-text-secondary hover:bg-gray-100 border-2 border-transparent'
+                        ? `${option.color} text-text-primary shadow-lg transform scale-105`
+                        : 'bg-white text-text-primary hover:bg-gray-50 hover:-translate-y-0.5 shadow-sm'
                     }
                   `}
                 >
