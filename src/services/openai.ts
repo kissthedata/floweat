@@ -111,8 +111,6 @@ export async function analyzeNutritionAndOrder(
     digestion: '소화가 편안하도록',
     satiety: '포만감이 오래 유지되도록',
     energy: '식후 졸림과 피로를 방지하도록',
-    muscle: '단백질 흡수를 높이고 근육 생성을 촉진하도록',
-    skin: '항산화 효과를 높이고 피부 건강을 개선하도록',
     weight: '혈당 스파이크를 억제하고 체지방 증가를 최소화하도록',
   };
 
@@ -120,8 +118,6 @@ export async function analyzeNutritionAndOrder(
     digestion: '소화 편안',
     satiety: '포만감 유지',
     energy: '졸림 방지',
-    muscle: '근육 생성',
-    skin: '피부 건강',
     weight: '체중 관리',
   };
 
@@ -270,8 +266,6 @@ export async function analyzeFoodImage(
     digestion: '소화가 편안하도록',
     satiety: '포만감이 오래 유지되도록',
     energy: '식후 졸림과 피로를 방지하도록',
-    muscle: '단백질 흡수를 높이고 근육 생성을 촉진하도록',
-    skin: '항산화 효과를 높이고 피부 건강을 개선하도록',
     weight: '혈당 스파이크를 억제하고 체지방 증가를 최소화하도록',
   };
 
@@ -396,8 +390,6 @@ export async function analyzeFoodImage(
       digestion: '소화 편안',
       satiety: '포만감 유지',
       energy: '졸림 방지',
-      muscle: '근육 생성',
-      skin: '피부 건강',
       weight: '체중 관리',
     };
 

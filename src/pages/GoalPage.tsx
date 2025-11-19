@@ -23,18 +23,6 @@ const GOALS: { id: EatingGoal; name: string; description: string; emoji: string 
     emoji: '⚡',
   },
   {
-    id: 'muscle',
-    name: '근육 생성',
-    description: '단백질 흡수를 높이는 순서',
-    emoji: '🏋️',
-  },
-  {
-    id: 'skin',
-    name: '피부 건강',
-    description: '항산화 영양소 섭취 최적화',
-    emoji: '✨',
-  },
-  {
     id: 'weight',
     name: '체중 관리',
     description: '혈당 조절로 체지방 증가 최소화',
