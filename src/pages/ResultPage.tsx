@@ -348,28 +348,60 @@ export default function ResultPage() {
             <FoodDetectionImage imageUrl={finalAnalysis.imageUrl} />
           </div>
 
+          {/* 한국 식사 문화 팁 배너 */}
+          <Card variant="outlined" className="mb-4 border-primary bg-primary-light">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0">🇰🇷</span>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-primary mb-1">
+                  한국 식사에 맞는 현실적인 가이드
+                </h4>
+                <p className="text-sm text-text-primary leading-relaxed">
+                  밥을 뚜껑을 열기 전에 반찬부터 시작하세요! 코스 요리처럼 완전히 분리해서 먹기보다는, 단계별로 우선순위를 두고 드시면 됩니다.
+                </p>
+              </div>
+            </div>
+          </Card>
+
           {/* 먹는 순서 카드 */}
           <Card variant="outlined" padding="lg" className="mb-4 border-primary">
             <h2 className="text-lg font-semibold text-text-primary mb-4">
               먹는 순서
             </h2>
 
-            <div className="space-y-3 mb-4">
-              {finalAnalysis.eatingOrder.steps.map((step) => (
-                <div key={step.order} className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold flex-shrink-0">
-                    {step.order}
+            <div className="space-y-4 mb-4">
+              {finalAnalysis.eatingOrder.steps.map((step, index) => {
+                // Extract wait time from description (e.g., "⏱️ 10분 정도 기다려주세요")
+                const timeMatch = step.description.match(/⏱️.*?(\d+)분/);
+                const waitMinutes = timeMatch ? parseInt(timeMatch[1]) : null;
+                const isLastStep = index === finalAnalysis.eatingOrder.steps.length - 1;
+
+                return (
+                  <div key={step.order}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold flex-shrink-0">
+                        {step.order}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-base font-medium text-text-primary">
+                          {step.foodName}
+                        </h3>
+                        <p className="text-sm text-text-secondary mt-1 leading-relaxed">
+                          {step.description}
+                        </p>
+
+                        {/* 타이머 추가 */}
+                        {waitMinutes && !isLastStep && (
+                          <SimpleTimer
+                            minutes={waitMinutes}
+                            stepName={step.foodName}
+                          />
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base font-medium text-text-primary">
-                      {step.foodName}
-                    </h3>
-                    <p className="text-sm text-text-secondary mt-1">
-                      {step.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="pt-4 border-t border-border">
@@ -546,4 +578,93 @@ export default function ResultPage() {
   }
 
   return null;
+}
+
+// Simple Timer Component
+function SimpleTimer({ minutes, stepName }: { minutes: number; stepName: string }) {
+  const [timeLeft, setTimeLeft] = useState(minutes * 60);
+  const [isRunning, setIsRunning] = useState(false);
+
+  useEffect(() => {
+    if (!isRunning || timeLeft === 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setIsRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isRunning, timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const progress = ((minutes * 60 - timeLeft) / (minutes * 60)) * 100;
+
+  return (
+    <div className="mt-3 p-3 bg-surface rounded-lg border border-border">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-text-secondary">
+          ⏱️ {stepName} 섭취 후 대기
+        </span>
+        <span className={`text-base font-bold ${timeLeft === 0 ? 'text-primary' : 'text-text-primary'}`}>
+          {formatTime(timeLeft)}
+        </span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3">
+        <div
+          className="h-full bg-primary transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className="flex gap-2">
+        {!isRunning && timeLeft > 0 ? (
+          <button
+            onClick={() => setIsRunning(true)}
+            className="flex-1 h-9 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
+          >
+            시작
+          </button>
+        ) : timeLeft > 0 ? (
+          <button
+            onClick={() => setIsRunning(false)}
+            className="flex-1 h-9 bg-surface text-text-primary rounded-lg text-sm font-medium border border-border hover:bg-gray-100 transition-colors"
+          >
+            일시정지
+          </button>
+        ) : null}
+
+        {timeLeft > 0 && (
+          <button
+            onClick={() => {
+              setTimeLeft(0);
+              setIsRunning(false);
+            }}
+            className="flex-1 h-9 bg-surface text-text-secondary rounded-lg text-sm font-medium border border-border hover:bg-gray-100 transition-colors"
+          >
+            건너뛰기
+          </button>
+        )}
+      </div>
+
+      {timeLeft === 0 && (
+        <div className="mt-2 p-2 bg-primary-light rounded-lg">
+          <p className="text-sm text-primary font-semibold text-center">
+            ✅ 다음 단계로 이동하세요!
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }

@@ -28,23 +28,29 @@ export default function TutorialPage() {
 
   const handleSkip = async () => {
     try {
+      console.log('[TutorialPage] handleSkip called');
       await markTutorialCompleted();
-      navigate('/');
+      console.log('[TutorialPage] Tutorial marked as completed (skip)');
+      navigate('/', { state: { tutorialCompleted: true } });
+      console.log('[TutorialPage] Navigation triggered (skip)');
     } catch (error) {
       console.error('Failed to mark tutorial as completed:', error);
       // 에러가 발생해도 홈으로 이동
-      navigate('/');
+      navigate('/', { state: { tutorialCompleted: true } });
     }
   };
 
   const handleComplete = async () => {
     try {
+      console.log('[TutorialPage] handleComplete called');
       await markTutorialCompleted();
-      navigate('/');
+      console.log('[TutorialPage] Tutorial marked as completed (complete)');
+      navigate('/', { state: { tutorialCompleted: true } });
+      console.log('[TutorialPage] Navigation triggered (complete)');
     } catch (error) {
       console.error('Failed to mark tutorial as completed:', error);
       // 에러가 발생해도 홈으로 이동
-      navigate('/');
+      navigate('/', { state: { tutorialCompleted: true } });
     }
   };
 

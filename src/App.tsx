@@ -17,14 +17,26 @@ function AppRoutes() {
 
   useEffect(() => {
     async function checkTutorial() {
+      console.log('[App] Checking tutorial completion...');
+      console.log('[App] location.state:', location.state);
+      console.log('[App] location.pathname:', location.pathname);
+
+      // location.state로 전달된 완료 상태 먼저 확인
+      if (location.state && (location.state as { tutorialCompleted?: boolean }).tutorialCompleted) {
+        console.log('[App] Tutorial completed via location.state');
+        setTutorialCompleted(true);
+        return;
+      }
+
       const completed = await checkTutorialCompleted();
+      console.log('[App] Tutorial completed from sessionStorage:', completed);
       setTutorialCompleted(completed);
     }
 
     if (!authLoading) {
       checkTutorial();
     }
-  }, [authLoading]);
+  }, [authLoading, location.pathname, location.state]);
 
   // 로딩 중일 때
   if (authLoading || tutorialCompleted === null) {
