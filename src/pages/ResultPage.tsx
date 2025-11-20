@@ -296,7 +296,7 @@ export default function ResultPage() {
           <div className="text-center">
             <div className="loader"></div>
             <p className="text-sm text-text-secondary mt-4">
-              AI가 영양 정보와 먹는 순서를 계산하고 있어요
+              AI가 영양 정보와 먹는 순서를 계산하고 있어요! 15초 정도 소요돼요!
             </p>
           </div>
         </div>
@@ -353,9 +353,9 @@ export default function ResultPage() {
             <Card variant="outlined" className="mb-4 border-primary bg-primary-light">
               <div className="flex items-start gap-3">
                 <span className="text-2xl flex-shrink-0">
-                  {finalAnalysis.eatingOrder.goal === 'weight' ? '⚖️' :
+                  {finalAnalysis.eatingOrder.goal === 'weight' ? '🎯' :
                    finalAnalysis.eatingOrder.goal === 'energy' ? '⚡' :
-                   finalAnalysis.eatingOrder.goal === 'satiety' ? '🎯' : '💚'}
+                   finalAnalysis.eatingOrder.goal === 'satiety' ? '💪' : '🌿'}
                 </span>
                 <div className="flex-1">
                   <h4 className="text-sm font-semibold text-primary mb-1">
