@@ -57,8 +57,8 @@ export default function TutorialPage() {
             title="같은 음식, 다른 순서"
             description="음식을 바꾸지 않아도, 먹는 순서만 바꾸면 건강이 달라집니다."
             highlights={[
-              '같은 칼로리라도 순서에 따라 혈당, 소화, 포만감이 달라져요',
-              '작은 변화로 큰 효과를 경험해보세요',
+              '같은 식단이라도 순서에 따라 혈당, 소화, 포만감이 달라져요',
+              '먹는 순서를 교정해 건강 목표를 효과적으로 달성할 수 있어요',
             ]}
             stepNumber={1}
             totalSteps={totalSteps}
@@ -75,11 +75,9 @@ export default function TutorialPage() {
             title="지금 당신에게 필요한 것은?"
             description="매 식사마다 다른 목표를 선택할 수 있어요"
             highlights={[
-              '🌿 소화: 편안한 소화를 원할 때',
-              '💪 포만감: 오래 배부르고 싶을 때',
-              '⚡ 에너지: 식곤증을 피하고 싶을 때',
-              '💪 근육: 운동 후 회복이 필요할 때',
-              '✨ 피부: 피부 건강을 챙기고 싶을 때',
+              '🌿 편안한 소화를 원할 때',
+              '💪 오래 배부르고 싶을 때',
+              '⚡ 식곤증을 피하고 싶을 때',
             ]}
             stepNumber={2}
             totalSteps={totalSteps}
@@ -96,7 +94,7 @@ export default function TutorialPage() {
             description="복잡한 입력 없이 간단하게 시작하세요"
             highlights={[
               '1️⃣ 식사 사진 촬영',
-              '2️⃣ 목표 선택 (소화/포만감/에너지 등)',
+              '2️⃣ 목표 선택 (소화/포만감/졸림 방지 등)',
               '3️⃣ AI가 음식을 분석하고 최적의 순서 제안',
             ]}
             stepNumber={3}
