@@ -49,6 +49,7 @@ export interface EatingOrderGuide {
   goalName: string;
   steps: EatingStep[];
   reason: string;
+  eatingGuide?: string;  // 목표별 식사 가이드 (일반인 + 과학적 지식)
 }
 
 // 식단 분석 결과

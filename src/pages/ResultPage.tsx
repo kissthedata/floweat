@@ -348,20 +348,26 @@ export default function ResultPage() {
             <FoodDetectionImage imageUrl={finalAnalysis.imageUrl} />
           </div>
 
-          {/* 한국 식사 문화 팁 배너 */}
-          <Card variant="outlined" className="mb-4 border-primary bg-primary-light">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">🇰🇷</span>
-              <div className="flex-1">
-                <h4 className="text-sm font-semibold text-primary mb-1">
-                  한국 식사에 맞는 현실적인 가이드
-                </h4>
-                <p className="text-sm text-text-primary leading-relaxed">
-                  밥을 뚜껑을 열기 전에 반찬부터 시작하세요! 코스 요리처럼 완전히 분리해서 먹기보다는, 단계별로 우선순위를 두고 드시면 됩니다.
-                </p>
+          {/* 목표별 식사 가이드 배너 */}
+          {finalAnalysis.eatingOrder.eatingGuide && (
+            <Card variant="outlined" className="mb-4 border-primary bg-primary-light">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl flex-shrink-0">
+                  {finalAnalysis.eatingOrder.goal === 'weight' ? '⚖️' :
+                   finalAnalysis.eatingOrder.goal === 'energy' ? '⚡' :
+                   finalAnalysis.eatingOrder.goal === 'satiety' ? '🎯' : '💚'}
+                </span>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-primary mb-1">
+                    {finalAnalysis.eatingOrder.goalName} 식사법
+                  </h4>
+                  <p className="text-sm text-text-primary leading-relaxed">
+                    {finalAnalysis.eatingOrder.eatingGuide}
+                  </p>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          )}
 
           {/* 먹는 순서 카드 */}
           <Card variant="outlined" padding="lg" className="mb-4 border-primary">
@@ -613,7 +619,7 @@ function SimpleTimer({ minutes, stepName }: { minutes: number; stepName: string 
     <div className="mt-3 p-3 bg-surface rounded-lg border border-border">
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs text-text-secondary">
-          ⏱️ {stepName} 섭취 후 대기
+          💡 {stepName} 몇 입 드신 후 시작하세요
         </span>
         <span className={`text-base font-bold ${timeLeft === 0 ? 'text-primary' : 'text-text-primary'}`}>
           {formatTime(timeLeft)}
@@ -634,7 +640,7 @@ function SimpleTimer({ minutes, stepName }: { minutes: number; stepName: string 
             onClick={() => setIsRunning(true)}
             className="flex-1 h-9 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
           >
-            시작
+            먹기 시작!
           </button>
         ) : timeLeft > 0 ? (
           <button
@@ -661,7 +667,7 @@ function SimpleTimer({ minutes, stepName }: { minutes: number; stepName: string 
       {timeLeft === 0 && (
         <div className="mt-2 p-2 bg-primary-light rounded-lg">
           <p className="text-sm text-primary font-semibold text-center">
-            ✅ 다음 단계로 이동하세요!
+            ✅ 충분합니다! 이제 다음 음식으로 넘어가세요
           </p>
         </div>
       )}
