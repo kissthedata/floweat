@@ -950,7 +950,7 @@ export default function SurveyPage() {
                 <div className="space-y-3 pt-2">
                   <div>
                     <label className="block text-sm font-medium text-text-primary mb-2">
-                      이메일 (선택)
+                      이메일 <span className="text-red-600">(둘 중 하나 필수)</span>
                     </label>
                     <input
                       type="email"
@@ -962,7 +962,7 @@ export default function SurveyPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-text-primary mb-2">
-                      전화번호 (선택)
+                      전화번호 <span className="text-red-600">(둘 중 하나 필수)</span>
                     </label>
                     <input
                       type="tel"
@@ -972,10 +972,15 @@ export default function SurveyPage() {
                       className="w-full h-12 px-4 border-2 border-border rounded-xl focus:border-primary focus:outline-none text-text-primary"
                     />
                   </div>
-                  {answers.wantsNotification && !answers.contactEmail && !answers.contactPhone && (
-                    <p className="text-xs text-red-600">
-                      이메일 또는 전화번호 중 하나를 입력해주세요
-                    </p>
+                  {answers.wantsNotification &&
+                   !answers.contactEmail?.trim() &&
+                   !answers.contactPhone?.trim() && (
+                    <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <span className="text-red-600 flex-shrink-0">⚠️</span>
+                      <p className="text-sm text-red-600 font-medium">
+                        이메일 또는 전화번호 중 하나를 입력해주세요
+                      </p>
+                    </div>
                   )}
                 </div>
               )}
@@ -992,7 +997,9 @@ export default function SurveyPage() {
               onPrev={prevStep}
               nextDisabled={
                 isSubmitting ||
-                (answers.wantsNotification && !answers.contactEmail && !answers.contactPhone)
+                (answers.wantsNotification &&
+                 !answers.contactEmail?.trim() &&
+                 !answers.contactPhone?.trim())
               }
               nextLabel={isSubmitting ? '저장 중...' : '제출'}
             />
