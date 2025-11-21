@@ -79,6 +79,17 @@ export default function ResultPage() {
     setEditedName('');
   };
 
+  const handleDeleteFood = (index: number) => {
+    // 최소 1개 음식은 유지
+    if (detectedFoods.length <= 1) {
+      alert('최소 1개의 음식이 필요합니다.');
+      return;
+    }
+
+    const updated = detectedFoods.filter((_, i) => i !== index);
+    setDetectedFoods(updated);
+  };
+
   // Phase 3: 음식 확인 완료 → 영양 분석
   const handleConfirmFoods = async () => {
     setPhase('analyzing');
@@ -215,13 +226,29 @@ export default function ResultPage() {
             <p className="text-xs text-text-tertiary mb-2">감지된 음식</p>
             <div className="flex flex-wrap gap-2">
               {detectedFoods.map((food, index) => (
-                <button
+                <div
                   key={index}
-                  onClick={() => handleEditFood(index)}
-                  className="px-3 py-1.5 bg-white rounded-full text-xs font-medium text-text-primary border border-border cursor-pointer hover:border-primary hover:bg-primary-light transition-colors"
+                  className="relative inline-flex items-center group"
                 >
-                  {food.name}
-                </button>
+                  <button
+                    onClick={() => handleEditFood(index)}
+                    className="px-3 py-1.5 pr-7 bg-white rounded-full text-xs font-medium text-text-primary border border-border cursor-pointer hover:border-primary hover:bg-primary-light transition-colors"
+                  >
+                    {food.name}
+                  </button>
+                  {detectedFoods.length > 1 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteFood(index);
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-text-tertiary hover:text-red-500 transition-colors"
+                      aria-label="음식 삭제"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               ))}
 
               {/* + 버튼 */}
