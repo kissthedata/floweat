@@ -29,11 +29,7 @@ export interface FoodItem {
     protein: number;       // 단백질 (g)
     fat: number;           // 지방 (g)
   };
-  warnings?: {                 // 주의사항 (2차 분석 후 추가)
-    timing?: string;           // 섭취 시간대 주의
-    overconsumption?: string;  // 과다섭취 주의
-    general?: string;          // 일반 주의사항
-  };
+  warnings?: string[];  // goal별 위험 요소 1-2개 (선별적, 해당 goal에 특별히 주의할 음식만)
 }
 
 // 먹는 순서 단계

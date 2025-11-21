@@ -357,7 +357,7 @@ export async function getCachedCalendarData(
       .select('data, expires_at')
       .eq('user_id', user.id)
       .eq('cache_key', cacheKey)
-      .single();
+      .maybeSingle();
 
     if (error || !data) return null;
 

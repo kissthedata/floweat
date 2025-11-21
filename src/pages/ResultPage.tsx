@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Button, Card } from '../components/common';
 import Spinner from '../components/common/Spinner';
 import { FoodDetectionImage } from '../components/result';
+import RichDescription from '../components/result/RichDescription';
 import { saveDiary, invalidateCalendarCache } from '../services/supabaseService';
 import { detectFoodsFromImage, analyzeNutritionAndOrder } from '../services/openai';
 import type { MealTime, FoodDiary, MealAnalysis, FoodCategory } from '../types';
@@ -392,9 +392,10 @@ export default function ResultPage() {
                         <h3 className="text-base font-medium text-text-primary">
                           {step.foodName}
                         </h3>
-                        <p className="text-sm text-text-secondary mt-1 leading-relaxed">
-                          {step.description}
-                        </p>
+                        <RichDescription
+                          description={step.description}
+                          recognizedFoods={finalAnalysis.foods}
+                        />
 
                         {/* 타이머 추가 */}
                         {waitMinutes && !isLastStep && (
@@ -415,90 +416,6 @@ export default function ResultPage() {
                 {finalAnalysis.eatingOrder.reason}
               </p>
             </div>
-          </Card>
-
-          {/* 영양 성분 파이 그래프 (탄단지 3개만) */}
-          <Card variant="default" padding="lg" className="mb-4">
-            <h2 className="text-lg font-semibold text-text-primary mb-4">
-              영양 성분 분석
-            </h2>
-
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: '탄수화물', value: finalAnalysis.totalNutrition.carbs, color: '#3b82f6' },
-                    { name: '단백질', value: finalAnalysis.totalNutrition.protein, color: '#ef4444' },
-                    { name: '지방', value: finalAnalysis.totalNutrition.fat, color: '#f59e0b' },
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
-                    const RADIAN = Math.PI / 180;
-
-                    // 내부 퍼센티지 위치
-                    const innerRadius2 = innerRadius + (outerRadius - innerRadius) * 0.5;
-                    const innerX = cx + innerRadius2 * Math.cos(-midAngle * RADIAN);
-                    const innerY = cy + innerRadius2 * Math.sin(-midAngle * RADIAN);
-
-                    // 외부 이름 위치
-                    const outerRadius2 = outerRadius + 30;
-                    const outerX = cx + outerRadius2 * Math.cos(-midAngle * RADIAN);
-                    const outerY = cy + outerRadius2 * Math.sin(-midAngle * RADIAN);
-
-                    return (
-                      <g>
-                        {/* 내부 퍼센티지 */}
-                        <text
-                          x={innerX}
-                          y={innerY}
-                          fill="white"
-                          textAnchor="middle"
-                          dominantBaseline="central"
-                          fontSize="14"
-                          fontWeight="bold"
-                        >
-                          {`${(percent * 100).toFixed(0)}%`}
-                        </text>
-                        {/* 외부 이름 */}
-                        <text
-                          x={outerX}
-                          y={outerY}
-                          fill="#191919"
-                          textAnchor={outerX > cx ? 'start' : 'end'}
-                          dominantBaseline="central"
-                          fontSize="13"
-                          fontWeight="500"
-                        >
-                          {name}
-                        </text>
-                      </g>
-                    );
-                  }}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {[
-                    { name: '탄수화물', value: finalAnalysis.totalNutrition.carbs, color: '#3b82f6' },
-                    { name: '단백질', value: finalAnalysis.totalNutrition.protein, color: '#ef4444' },
-                    { name: '지방', value: finalAnalysis.totalNutrition.fat, color: '#f59e0b' },
-                  ].map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-
-            {/* AI 영양 분석 코멘트 */}
-            {finalAnalysis.nutritionAnalysis && (
-              <div className="mt-3 p-4 bg-purple-50 rounded-lg">
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {finalAnalysis.nutritionAnalysis}
-                </p>
-              </div>
-            )}
           </Card>
 
           {/* 음식별 영양 효능 */}
@@ -531,27 +448,15 @@ export default function ResultPage() {
                       {food.nutritionBenefits}
                     </p>
 
-                    {/* 주의사항 */}
-                    {food.warnings && (
+                    {/* Goal별 주의사항 */}
+                    {food.warnings && food.warnings.length > 0 && (
                       <div className="mt-2 space-y-1">
-                        {food.warnings.timing && (
-                          <div className="flex items-start gap-1.5 text-xs text-orange-600">
-                            <span>⏰</span>
-                            <span>{food.warnings.timing}</span>
-                          </div>
-                        )}
-                        {food.warnings.overconsumption && (
-                          <div className="flex items-start gap-1.5 text-xs text-red-600">
+                        {food.warnings.map((warning, idx) => (
+                          <div key={idx} className="flex items-start gap-1.5 text-xs text-orange-600">
                             <span>⚠️</span>
-                            <span>{food.warnings.overconsumption}</span>
+                            <span>{warning}</span>
                           </div>
-                        )}
-                        {food.warnings.general && (
-                          <div className="flex items-start gap-1.5 text-xs text-amber-600">
-                            <span>💡</span>
-                            <span>{food.warnings.general}</span>
-                          </div>
-                        )}
+                        ))}
                       </div>
                     )}
                   </div>
