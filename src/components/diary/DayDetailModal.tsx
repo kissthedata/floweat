@@ -3,6 +3,7 @@ import type { FoodDiary, MealTime } from '../../types';
 import { getDiariesByDate, deleteDiary, invalidateCalendarCache } from '../../services/supabaseService';
 import { formatDate } from '../../utils/dateUtils';
 import { Card } from '../common';
+import { FoodDetectionImage } from '../result';
 
 interface DayDetailModalProps {
   date: Date | null;
@@ -176,6 +177,16 @@ export default function DayDetailModal({ date, onClose, onRefresh }: DayDetailMo
                     >
                       🗑️ 삭제
                     </button>
+                  </div>
+                )}
+
+                {/* 음식 사진 */}
+                {currentDiary.imageUrl && (
+                  <div className="mb-4">
+                    <h3 className="text-base font-semibold text-text-primary mb-3">
+                      음식 사진
+                    </h3>
+                    <FoodDetectionImage imageUrl={currentDiary.imageUrl} />
                   </div>
                 )}
 

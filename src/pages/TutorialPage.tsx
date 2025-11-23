@@ -45,12 +45,16 @@ export default function TutorialPage() {
       console.log('[TutorialPage] handleComplete called');
       await markTutorialCompleted();
       console.log('[TutorialPage] Tutorial marked as completed (complete)');
-      navigate('/', { state: { tutorialCompleted: true } });
-      console.log('[TutorialPage] Navigation triggered (complete)');
+
+      // sessionStorage 저장이 확실히 완료되도록 약간의 지연 추가
+      setTimeout(() => {
+        navigate('/', { state: { tutorialCompleted: true }, replace: true });
+        console.log('[TutorialPage] Navigation triggered (complete)');
+      }, 100);
     } catch (error) {
       console.error('Failed to mark tutorial as completed:', error);
       // 에러가 발생해도 홈으로 이동
-      navigate('/', { state: { tutorialCompleted: true } });
+      navigate('/', { state: { tutorialCompleted: true }, replace: true });
     }
   };
 

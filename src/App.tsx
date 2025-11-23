@@ -36,7 +36,7 @@ function AppRoutes() {
     if (!authLoading) {
       checkTutorial();
     }
-  }, [authLoading, location.pathname, location.state]);
+  }, [authLoading, location.pathname]); // location.state 제거로 무한 루프 방지
 
   // 로딩 중일 때
   if (authLoading || tutorialCompleted === null) {
