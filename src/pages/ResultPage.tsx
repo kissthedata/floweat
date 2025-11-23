@@ -549,21 +549,45 @@ function SimpleTimer({ minutes, stepName }: { minutes: number; stepName: string 
 
   return (
     <div className="mt-3 p-3 bg-surface rounded-lg border border-border">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-center mb-3">
         <span className="text-xs text-text-secondary">
-          💡 {stepName} 몇 입 드신 후 시작하세요
-        </span>
-        <span className={`text-base font-bold ${timeLeft === 0 ? 'text-primary' : 'text-text-primary'}`}>
-          {formatTime(timeLeft)}
         </span>
       </div>
 
-      {/* Progress bar */}
-      <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3">
-        <div
-          className="h-full bg-primary transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
+      {/* Circular Progress */}
+      <div className="flex items-center justify-center mb-3">
+        <div className="relative w-20 h-20">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
+            {/* Background circle */}
+            <circle
+              cx="40"
+              cy="40"
+              r="36"
+              stroke="#e5e7eb"
+              strokeWidth="6"
+              fill="none"
+            />
+            {/* Progress circle */}
+            <circle
+              cx="40"
+              cy="40"
+              r="36"
+              stroke="#4ae523"
+              strokeWidth="6"
+              fill="none"
+              strokeDasharray={226.19}
+              strokeDashoffset={226.19 * (1 - progress / 100)}
+              className="transition-all duration-300"
+              strokeLinecap="round"
+            />
+          </svg>
+          {/* Center time display */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className={`text-lg font-bold ${timeLeft === 0 ? 'text-primary' : 'text-text-primary'}`}>
+              {formatTime(timeLeft)}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="flex gap-2">
@@ -572,7 +596,7 @@ function SimpleTimer({ minutes, stepName }: { minutes: number; stepName: string 
             onClick={() => setIsRunning(true)}
             className="flex-1 h-9 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
           >
-            먹기 시작!
+            시작
           </button>
         ) : timeLeft > 0 ? (
           <button

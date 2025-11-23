@@ -6,9 +6,10 @@
 const TUTORIAL_COMPLETED_KEY = 'tutorialCompleted';
 
 /**
- * 사용자의 튜토리얼 완료 여부 확인
+ * 사용자의 튜토리얼 완료 여부 확인 (동기)
+ * 리다이렉션 로직에서 사용하기 위한 동기 버전
  */
-export async function checkTutorialCompleted(): Promise<boolean> {
+export function checkTutorialCompletedSync(): boolean {
   try {
     const completed = sessionStorage.getItem(TUTORIAL_COMPLETED_KEY);
     return completed === 'true';
@@ -16,6 +17,13 @@ export async function checkTutorialCompleted(): Promise<boolean> {
     console.error('Failed to check tutorial completion:', error);
     return false;
   }
+}
+
+/**
+ * 사용자의 튜토리얼 완료 여부 확인 (비동기, 호환성 유지)
+ */
+export async function checkTutorialCompleted(): Promise<boolean> {
+  return checkTutorialCompletedSync();
 }
 
 /**

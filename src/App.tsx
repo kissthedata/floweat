@@ -8,7 +8,7 @@ import DiaryPage from './pages/DiaryPage';
 import SurveyPage from './pages/SurveyPage';
 import TutorialPage from './pages/TutorialPage';
 import MainLayout from './components/layout/MainLayout';
-import { checkTutorialCompleted } from './services/userPreferencesService';
+import { checkTutorialCompleted, checkTutorialCompletedSync } from './services/userPreferencesService';
 
 function AppRoutes() {
   const location = useLocation();
@@ -18,25 +18,16 @@ function AppRoutes() {
   useEffect(() => {
     async function checkTutorial() {
       console.log('[App] Checking tutorial completion...');
-      console.log('[App] location.state:', location.state);
-      console.log('[App] location.pathname:', location.pathname);
-
-      // location.state로 전달된 완료 상태 먼저 확인
-      if (location.state && (location.state as { tutorialCompleted?: boolean }).tutorialCompleted) {
-        console.log('[App] Tutorial completed via location.state');
-        setTutorialCompleted(true);
-        return;
-      }
 
       const completed = await checkTutorialCompleted();
-      console.log('[App] Tutorial completed from sessionStorage:', completed);
+      console.log('[App] Tutorial completed:', completed);
       setTutorialCompleted(completed);
     }
 
     if (!authLoading) {
       checkTutorial();
     }
-  }, [authLoading, location.pathname]); // location.state 제거로 무한 루프 방지
+  }, [authLoading]); // sessionStorage만 신뢰, pathname 변경에 반응 안 함
 
   // 로딩 중일 때
   if (authLoading || tutorialCompleted === null) {
@@ -48,7 +39,8 @@ function AppRoutes() {
   }
 
   // 튜토리얼을 완료하지 않았고, 튜토리얼 페이지가 아닌 경우 튜토리얼로 리다이렉트
-  if (!tutorialCompleted && location.pathname !== '/tutorial') {
+  // sessionStorage를 직접 확인하여 React 상태 업데이트 타이밍 이슈 방지
+  if (!checkTutorialCompletedSync() && location.pathname !== '/tutorial') {
     return <Navigate to="/tutorial" replace />;
   }
 
