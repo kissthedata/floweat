@@ -278,7 +278,7 @@ export default function ResultPage() {
                     </div>
                     <div>
                       <h3 className="text-base font-medium text-text-primary">
-                        {step.categoryName}
+                        {step.foodName}
                       </h3>
                       <p className="text-sm text-text-secondary mt-1">
                         {step.description}
@@ -308,15 +308,11 @@ export default function ResultPage() {
                       { name: '탄수화물', value: analysisResult.totalNutrition.carbs, color: '#3b82f6' },
                       { name: '단백질', value: analysisResult.totalNutrition.protein, color: '#ef4444' },
                       { name: '지방', value: analysisResult.totalNutrition.fat, color: '#f59e0b' },
-                      { name: '당', value: analysisResult.totalNutrition.sugar, color: '#ec4899' },
-                      { name: '나트륨', value: analysisResult.totalNutrition.sodium, color: '#8b5cf6' },
-                      { name: '식이섬유', value: analysisResult.totalNutrition.fiber, color: '#10b981' },
-                      { name: '콜레스테롤', value: analysisResult.totalNutrition.cholesterol, color: '#6b7280' },
                     ]}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
@@ -325,10 +321,6 @@ export default function ResultPage() {
                       { name: '탄수화물', value: analysisResult.totalNutrition.carbs, color: '#3b82f6' },
                       { name: '단백질', value: analysisResult.totalNutrition.protein, color: '#ef4444' },
                       { name: '지방', value: analysisResult.totalNutrition.fat, color: '#f59e0b' },
-                      { name: '당', value: analysisResult.totalNutrition.sugar, color: '#ec4899' },
-                      { name: '나트륨', value: analysisResult.totalNutrition.sodium, color: '#8b5cf6' },
-                      { name: '식이섬유', value: analysisResult.totalNutrition.fiber, color: '#10b981' },
-                      { name: '콜레스테롤', value: analysisResult.totalNutrition.cholesterol, color: '#6b7280' },
                     ].map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}

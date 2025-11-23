@@ -10,22 +10,6 @@ export interface TextPart {
   foodName?: string; // 매칭된 음식 이름 (색상 할당용)
 }
 
-/**
- * 한글 조사 제거
- * 예: "샐러드를" -> "샐러드", "오이와" -> "오이"
- */
-function removeKoreanParticles(text: string): string {
-  // 일반적인 한글 조사 패턴
-  const particles = ['을', '를', '이', '가', '은', '는', '와', '과', '에', '의', '으로', '로'];
-
-  for (const particle of particles) {
-    if (text.endsWith(particle)) {
-      return text.slice(0, -particle.length);
-    }
-  }
-
-  return text;
-}
 
 /**
  * 설명 텍스트에서 인식된 음식명 찾기

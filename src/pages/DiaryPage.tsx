@@ -8,8 +8,8 @@ export default function DiaryPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [stats, setStats] = useState({ totalMeals: 0, totalCalories: 0, avgCalories: 0, mealCounts: { breakfast: 0, lunch: 0, dinner: 0 } });
-  const [hasDiaries, setHasDiaries] = useState(false);
+  const [, setStats] = useState({ totalMeals: 0, totalCalories: 0, avgCalories: 0, mealCounts: { breakfast: 0, lunch: 0, dinner: 0 } });
+  const [, setHasDiaries] = useState(false);
 
   const today = new Date();
 
@@ -17,7 +17,11 @@ export default function DiaryPage() {
   useEffect(() => {
     async function loadStats() {
       const monthStats = await getMonthlyStats(today.getFullYear(), today.getMonth());
-      setStats(monthStats);
+      setStats({
+        ...monthStats,
+        totalCalories: 0,
+        avgCalories: 0
+      });
 
       const diaries = await getAllDiaries();
       setHasDiaries(diaries.length > 0);

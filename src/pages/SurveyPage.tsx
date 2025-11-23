@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '../components/common';
 import { supabase } from '../lib/supabase';
 
 interface SurveyAnswers {
@@ -36,7 +35,6 @@ export default function SurveyPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const totalSteps = 13; // Q0-Q12
-  const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const nextStep = () => {
     setFadeIn(false);
@@ -1101,12 +1099,11 @@ function QuestionBox({
 
 // 척도 버튼 컴포넌트 (1-5점)
 function ScaleButton({
-  value,
   children,
   onClick,
   selected,
 }: {
-  value: number;
+  value?: number;
   children: React.ReactNode;
   onClick: () => void;
   selected?: boolean;
@@ -1115,30 +1112,6 @@ function ScaleButton({
     <button
       onClick={onClick}
       className={`w-full h-14 font-medium rounded-xl transition-all active:scale-95 text-left px-5 ${
-        selected
-          ? 'bg-green-500 text-white'
-          : 'bg-surface text-text-primary hover:bg-gray-100'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-// 선택 버튼 컴포넌트 (Q10용)
-function OptionButton({
-  children,
-  onClick,
-  selected,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  selected?: boolean;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full h-14 font-semibold rounded-xl transition-all active:scale-95 ${
         selected
           ? 'bg-green-500 text-white'
           : 'bg-surface text-text-primary hover:bg-gray-100'

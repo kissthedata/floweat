@@ -2,7 +2,6 @@
  * 먹는 순서 설명에서 인식된 음식명을 컬러풀한 태그로 표시하는 컴포넌트
  */
 
-import React from 'react';
 import type { FoodItem } from '../../types';
 import { highlightRecognizedFoods } from '../../utils/highlightRecognizedFoods';
 import { getFoodTagColor } from '../../utils/foodTagColors';

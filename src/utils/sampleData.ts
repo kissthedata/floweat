@@ -6,7 +6,6 @@ import { saveDiary } from '../services/supabaseService';
  */
 export async function generateSampleDiaries() {
   const now = new Date();
-  const samples: Omit<FoodDiary, 'id' | 'timestamp'>[] = [];
 
   // 지난 14일간의 데이터 생성
   for (let daysAgo = 0; daysAgo < 14; daysAgo++) {
@@ -77,20 +76,17 @@ function getSampleMealData(mealTime: MealTime) {
         steps: [
           {
             order: 1,
-            category: 'vegetable' as const,
-            categoryName: '야채/섬유질',
+            foodName: '샐러드',
             description: '샐러드를 먼저 드세요',
           },
           {
             order: 2,
-            category: 'protein' as const,
-            categoryName: '단백질',
+            foodName: '계란',
             description: '계란 드세요',
           },
           {
             order: 3,
-            category: 'carbohydrate' as const,
-            categoryName: '탄수화물',
+            foodName: '토스트',
             description: '토스트는 마지막에',
           },
         ],
@@ -127,20 +123,17 @@ function getSampleMealData(mealTime: MealTime) {
         steps: [
           {
             order: 1,
-            category: 'protein' as const,
-            categoryName: '단백질',
+            foodName: '요거트',
             description: '요거트를 먼저',
           },
           {
             order: 2,
-            category: 'carbohydrate' as const,
-            categoryName: '탄수화물',
+            foodName: '오트밀',
             description: '오트밀',
           },
           {
             order: 3,
-            category: 'sugar' as const,
-            categoryName: '과일',
+            foodName: '과일',
             description: '마지막에 드세요',
           },
         ],
@@ -180,20 +173,17 @@ function getSampleMealData(mealTime: MealTime) {
         steps: [
           {
             order: 1,
-            category: 'vegetable' as const,
-            categoryName: '야채',
+            foodName: '브로콜리',
             description: '브로콜리 먼저',
           },
           {
             order: 2,
-            category: 'protein' as const,
-            categoryName: '단백질',
+            foodName: '닭가슴살',
             description: '닭가슴살',
           },
           {
             order: 3,
-            category: 'carbohydrate' as const,
-            categoryName: '탄수화물',
+            foodName: '현미밥',
             description: '현미밥 마지막',
           },
         ],
@@ -230,20 +220,17 @@ function getSampleMealData(mealTime: MealTime) {
         steps: [
           {
             order: 1,
-            category: 'vegetable' as const,
-            categoryName: '채소',
+            foodName: '김치',
             description: '김치',
           },
           {
             order: 2,
-            category: 'protein' as const,
-            categoryName: '단백질',
+            foodName: '된장찌개',
             description: '된장찌개',
           },
           {
             order: 3,
-            category: 'carbohydrate' as const,
-            categoryName: '탄수화물',
+            foodName: '밥',
             description: '밥',
           },
         ],
@@ -283,20 +270,17 @@ function getSampleMealData(mealTime: MealTime) {
         steps: [
           {
             order: 1,
-            category: 'vegetable' as const,
-            categoryName: '야채',
+            foodName: '구운야채',
             description: '구운 야채 먼저',
           },
           {
             order: 2,
-            category: 'protein' as const,
-            categoryName: '단백질',
+            foodName: '연어구이',
             description: '연어',
           },
           {
             order: 3,
-            category: 'carbohydrate' as const,
-            categoryName: '탄수화물',
+            foodName: '퀴노아',
             description: '퀴노아',
           },
         ],

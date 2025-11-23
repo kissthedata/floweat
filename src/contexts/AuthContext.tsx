@@ -19,18 +19,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // 초기 세션 확인
     supabase.auth.getSession()
-      .then(({ data: { session } }) => {
+      .then(async ({ data: { session } }) => {
         setUser(session?.user ?? null);
 
         // 세션이 없으면 익명 로그인
         if (!session) {
-          return supabase.auth.signInAnonymously();
-        }
-        return { data: { user: session.user } };
-      })
-      .then(({ data }) => {
-        if (data?.user) {
-          setUser(data.user);
+          const { data } = await supabase.auth.signInAnonymously();
+          if (data?.user) {
+            setUser(data.user);
+          }
         }
         setLoading(false);
       })

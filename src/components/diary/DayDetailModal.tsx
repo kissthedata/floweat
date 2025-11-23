@@ -19,7 +19,7 @@ export default function DayDetailModal({ date, onClose, onRefresh }: DayDetailMo
     if (date) {
       async function loadDiaries() {
         setIsLoading(true);
-        const dayDiaries = await getDiariesByDate(date);
+        const dayDiaries = await getDiariesByDate(date!);
         setDiaries(dayDiaries);
 
         // 첫 번째 식사로 자동 선택

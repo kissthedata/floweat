@@ -24,7 +24,7 @@ export default function Calendar({ onDateClick }: CalendarProps) {
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [dates, setDates] = useState<CalendarDate[]>([]);
-  const [mealsByDate, setMealsByDate] = useState<Map<string, MealTime[]>>(new Map());
+  const [, setMealsByDate] = useState<Map<string, MealTime[]>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
   // 월별 데이터 로드 (캐시 우선)
