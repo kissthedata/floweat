@@ -189,7 +189,7 @@ export default function HomePage() {
 
           <Card variant="default" padding="lg" className="mb-4">
             <img
-              src="/examples/sample-meal.jpg"
+              src="/examples/sample-meal2.jpg"
               alt="예시 음식 사진"
               className="w-full h-auto object-contain rounded-lg mb-4"
               onError={(e) => {
@@ -248,7 +248,7 @@ export default function HomePage() {
             </p>
             <button
               onClick={() => navigate('/survey')}
-              className="w-full h-14 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors"
+              className="w-full h-14 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 transition-colors"
             >
               설문하기
             </button>

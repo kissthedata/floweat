@@ -30,7 +30,7 @@ export default function ResultPage() {
   const [editedName, setEditedName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(location.state?.isSaved || false);
 
   // Phase 1: 음식 감지
   useEffect(() => {
@@ -534,7 +534,8 @@ export default function ResultPage() {
                       imageUrl,
                       finalAnalysis,
                       detectedFoods,
-                      phase
+                      phase,
+                      isSaved
                     }
                   })}
                   className="flex-1 py-3 bg-primary/10 text-primary rounded-xl font-medium text-sm transition-all hover:bg-primary/20 hover:scale-105 active:scale-95"

@@ -10,6 +10,7 @@ export default function WalkingPage() {
   const finalAnalysis = location.state?.finalAnalysis;
   const detectedFoods = location.state?.detectedFoods;
   const phase = location.state?.phase;
+  const isSaved = location.state?.isSaved;
 
   const [timeLeft, setTimeLeft] = useState(initialMinutes * 60); // 초 단위
   const [isRunning, setIsRunning] = useState(false);
@@ -56,7 +57,7 @@ export default function WalkingPage() {
   // 종료 확인
   const handleExit = () => {
     navigate('/result', {
-      state: { goal, imageUrl, finalAnalysis, detectedFoods, phase },
+      state: { goal, imageUrl, finalAnalysis, detectedFoods, phase, isSaved },
       replace: true
     });
   };
@@ -64,7 +65,7 @@ export default function WalkingPage() {
   // 완료 후 돌아가기
   const handleComplete = () => {
     navigate('/result', {
-      state: { goal, imageUrl, finalAnalysis, detectedFoods, phase },
+      state: { goal, imageUrl, finalAnalysis, detectedFoods, phase, isSaved },
       replace: true
     });
   };
