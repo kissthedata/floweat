@@ -201,8 +201,8 @@ export default function HomePage() {
               <button
                 onClick={() => {
                   const link = document.createElement('a');
-                  link.href = '/examples/sample-meal.jpg';
-                  link.download = 'sample-meal.jpg';
+                  link.href = '/examples/sample-meal2.jpg';
+                  link.download = 'sample-meal2.jpg';
                   link.click();
                 }}
                 className="flex-1 h-14 bg-surface text-text-primary font-semibold rounded-xl hover:bg-gray-100 transition-colors"
@@ -212,7 +212,7 @@ export default function HomePage() {
               <button
                 onClick={() => {
                   // 예시 이미지를 base64로 변환하여 GoalPage로 이동
-                  fetch('/examples/sample-meal.jpg')
+                  fetch('/examples/sample-meal2.jpg')
                     .then(res => res.blob())
                     .then(blob => {
                       const reader = new FileReader();
