@@ -16,18 +16,29 @@ export default function ResultPage() {
   const goal = location.state?.goal || 'satiety';
   const imageUrl = location.state?.imageUrl || '';
 
-  const [phase, setPhase] = useState<Phase>('detecting');
+  // WalkingPage에서 돌아올 때 분석 데이터 복원
+  const cachedAnalysis = location.state?.finalAnalysis;
+  const cachedFoods = location.state?.detectedFoods;
+
+  // 캐시된 분석 결과가 있으면 바로 'done' phase로 시작
+  const [phase, setPhase] = useState<Phase>(cachedAnalysis ? 'done' : 'detecting');
   const [selectedMealTime, setSelectedMealTime] = useState<MealTime>('lunch');
-  const [detectedFoods, setDetectedFoods] = useState<{ name: string; category: FoodCategory }[]>([]);
-  const [finalAnalysis, setFinalAnalysis] = useState<MealAnalysis | null>(null);
+  const [detectedFoods, setDetectedFoods] = useState<{ name: string; category: FoodCategory }[]>(cachedFoods || []);
+  const [finalAnalysis, setFinalAnalysis] = useState<MealAnalysis | null>(cachedAnalysis || null);
   const [error, setError] = useState<string | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedName, setEditedName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
 
   // Phase 1: 음식 감지
   useEffect(() => {
+    // 이미 분석된 데이터가 있으면 재분석 안 함
+    if (cachedAnalysis && cachedFoods) {
+      return;
+    }
+
     async function detectFoods() {
       if (!imageUrl) {
         setError('이미지를 찾을 수 없습니다.');
@@ -45,7 +56,7 @@ export default function ResultPage() {
     }
 
     detectFoods();
-  }, [imageUrl]);
+  }, [imageUrl, cachedAnalysis, cachedFoods]);
 
   // 음식 추가
   const handleAddFood = () => {
@@ -140,13 +151,19 @@ export default function ResultPage() {
       const month = savedDate.getMonth();
       await invalidateCalendarCache(year, month);
 
-      navigate('/');
+      // 저장 완료 상태로 변경
+      setIsSaved(true);
     } catch (err) {
       console.error('Failed to save diary:', err);
       setSaveError('기록 저장에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // 처음으로 버튼 클릭
+  const handleGoHome = () => {
+    navigate('/');
   };
 
   const mealTimeOptions = [
@@ -493,6 +510,43 @@ export default function ResultPage() {
           </div>
         </div>
 
+        {/* 혈당 낮추기 걷기 카드 */}
+        <div className="px-5 mb-4">
+          <Card className="border-2 border-primary/20">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="text-2xl">🚶‍♂️</div>
+              <div>
+                <h3 className="text-base font-semibold text-text-primary">
+                  식후 걷기
+                </h3>
+                <p className="text-sm text-text-secondary">
+                  혈당 조절을 위해 가볍게 걸어보세요
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {[10, 15, 20].map((minutes) => (
+                <button
+                  key={minutes}
+                  onClick={() => navigate('/walking', {
+                    state: {
+                      minutes,
+                      goal,
+                      imageUrl,
+                      finalAnalysis,
+                      detectedFoods,
+                      phase
+                    }
+                  })}
+                  className="flex-1 py-3 bg-primary/10 text-primary rounded-xl font-medium text-sm transition-all hover:bg-primary/20 hover:scale-105 active:scale-95"
+                >
+                  {minutes}분
+                </button>
+              ))}
+            </div>
+          </Card>
+        </div>
+
         {/* 기록하기 버튼 */}
         <div className="page-bottom">
           {saveError && (
@@ -500,16 +554,25 @@ export default function ResultPage() {
               {saveError}
             </div>
           )}
-          <Button fullWidth onClick={handleSaveDiary} disabled={isSaving}>
-            {isSaving ? (
-              <span className="flex items-center justify-center gap-2">
-                <Spinner size="sm" color="#ffffff" />
-                저장 중...
-              </span>
-            ) : (
-              '기록하기'
-            )}
-          </Button>
+          {isSaved ? (
+            <button
+              onClick={handleGoHome}
+              className="w-full h-14 bg-gray-700 text-white rounded-xl font-semibold text-lg transition-all hover:bg-gray-800 hover:scale-105 active:scale-95"
+            >
+              처음으로
+            </button>
+          ) : (
+            <Button fullWidth onClick={handleSaveDiary} disabled={isSaving}>
+              {isSaving ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Spinner size="sm" color="#ffffff" />
+                  저장 중...
+                </span>
+              ) : (
+                '기록하기'
+              )}
+            </Button>
+          )}
         </div>
       </div>
     );

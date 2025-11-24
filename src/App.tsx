@@ -7,6 +7,7 @@ import ResultPage from './pages/ResultPage';
 import DiaryPage from './pages/DiaryPage';
 import SurveyPage from './pages/SurveyPage';
 import TutorialPage from './pages/TutorialPage';
+import WalkingPage from './pages/WalkingPage';
 import MainLayout from './components/layout/MainLayout';
 import { checkTutorialCompleted, checkTutorialCompletedSync } from './services/userPreferencesService';
 
@@ -69,6 +70,7 @@ function AppRoutes() {
       <Route path="/goal" element={<GoalPage />} />
       <Route path="/result" element={<ResultPage />} />
       <Route path="/survey" element={<SurveyPage />} />
+      <Route path="/walking" element={<WalkingPage />} />
     </Routes>
   );
 }
