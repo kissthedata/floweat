@@ -582,7 +582,7 @@ export default function ResultPage() {
 }
 
 // Simple Timer Component
-function SimpleTimer({ minutes, stepName }: { minutes: number; stepName: string }) {
+function SimpleTimer({ minutes }: { minutes: number }) {
   const [timeLeft, setTimeLeft] = useState(minutes * 60);
   const [isRunning, setIsRunning] = useState(false);
 
