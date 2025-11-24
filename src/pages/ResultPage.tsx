@@ -445,7 +445,6 @@ export default function ResultPage() {
                         {waitMinutes && !isLastStep && (
                           <SimpleTimer
                             minutes={waitMinutes}
-                            stepName={step.foodName}
                           />
                         )}
                       </div>
