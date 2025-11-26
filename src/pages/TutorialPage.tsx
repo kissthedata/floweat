@@ -57,7 +57,7 @@ export default function TutorialPage() {
       case 0:
         return (
           <TutorialStep
-            headerImage="/icons/tutorial_1.png"
+            headerImage="/icons/tutorial_1.png?v=2"
             title="같은 음식, 다른 순서"
             description="일단, 먹는 순서만 바꾸는 것 부터 시작해봐요."
             highlights={[
