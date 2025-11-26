@@ -59,7 +59,7 @@ export default function TutorialPage() {
           <TutorialStep
             headerImage="/icons/tutorial_1.png"
             title="같은 음식, 다른 순서"
-            description="음식을 바꾸지 않아도, 먹는 순서만 바꾸면 건강이 달라집니다."
+            description="일단, 먹는 순서만 바꾸는 것 부터 시작해봐요."
             highlights={[
               '같은 식단이라도 순서에 따라 혈당, 소화, 포만감이 달라져요',
               '먹는 순서를 교정해 건강 목표를 효과적으로 달성할 수 있어요',
